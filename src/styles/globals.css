@@ -1,0 +1,291 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS Variables */
+:root {
+  --rack-unit-height: 44px;
+  --rack-width: 600px;
+  --rack-frame-color: #2a2a2a;
+  --rack-highlight-color: #4a90e2;
+  --snap-color: #ffd700;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Rack-specific styles */
+.rack-container {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  box-shadow: 
+    inset 0 0 0 4px var(--rack-frame-color),
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.rack-unit {
+  position: relative;
+  height: var(--rack-unit-height);
+  border-bottom: 1px solid #d1d5db;
+  transition: background-color 0.2s ease;
+}
+
+.rack-unit:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.rack-unit-label {
+  position: absolute;
+  left: -32px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  user-select: none;
+}
+
+/* Component styles */
+.component-card {
+  transition: all 0.2s ease;
+  cursor: grab;
+}
+
+.component-card:active {
+  cursor: grabbing;
+}
+
+.component-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.component-placed {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.component-placed:hover {
+  border-color: var(--rack-highlight-color);
+  box-shadow: 0 4px 16px rgba(74, 144, 226, 0.2);
+}
+
+.component-selected {
+  border-color: var(--rack-highlight-color) !important;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3) !important;
+}
+
+/* Drag and drop styles */
+.drag-preview {
+  pointer-events: none;
+  z-index: 1000;
+  transform: rotate(3deg) scale(1.05);
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+}
+
+.drop-zone-active {
+  background-color: rgba(74, 144, 226, 0.1);
+  border-color: var(--rack-highlight-color);
+}
+
+.snap-guide {
+  border: 2px dashed var(--snap-color);
+  background-color: rgba(255, 215, 0, 0.1);
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Scrollbar styling */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Animation utilities */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-pulse-soft {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Grid pattern for canvas background */
+.canvas-grid {
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Utility classes */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.shadow-soft {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-medium {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.shadow-strong {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+}
+
+/* Component category colors */
+.category-server { color: #3b82f6; background-color: #eff6ff; }
+.category-storage { color: #10b981; background-color: #f0fdf4; }
+.category-network { color: #f59e0b; background-color: #fffbeb; }
+.category-power { color: #8b5cf6; background-color: #faf5ff; }
+.category-cooling { color: #06b6d4; background-color: #f0fdfa; }
+.category-management { color: #6b7280; background-color: #f9fafb; }
+.category-blank { color: #9ca3af; background-color: #f3f4f6; }
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+/* Text selection */
+::selection {
+  background-color: rgba(74, 144, 226, 0.3);
+  color: inherit;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .rack-container {
+    box-shadow: none;
+    border: 2px solid #000;
+  }
+  
+  .component-placed {
+    border-color: #000 !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .rack-container {
+    transform: scale(0.8);
+    transform-origin: top left;
+  }
+  
+  .component-library {
+    width: 100%;
+    height: 40vh;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .rack-unit {
+    border-color: #000;
+  }
+  
+  .component-placed {
+    border-color: #000;
+  }
+  
+  .snap-guide {
+    border-color: #ff0000;
+    background-color: rgba(255, 0, 0, 0.2);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark mode support (future enhancement) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --rack-frame-color: #404040;
+    --rack-highlight-color: #60a5fa;
+  }
+}
