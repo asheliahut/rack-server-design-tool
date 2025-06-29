@@ -32,7 +32,7 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
   // Set up drop area for removing components
   const [{ isOver, canDrop }, drop] = useDrop<DragItem, void, { isOver: boolean; canDrop: boolean }>({
     accept: 'component',
-    drop: (item, monitor) => {
+    drop: (item, _monitor) => {
       // Only remove if the item has a sourcePosition (meaning it's from the rack)
       if (item.sourcePosition && onComponentRemove) {
         onComponentRemove(item.component.id);
@@ -96,7 +96,7 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
 
   return (
     <div 
-      ref={drop}
+      ref={drop as unknown as React.Ref<HTMLDivElement>}
       id="component-library" 
       className={`w-80 bg-white border-r border-gray-300 flex flex-col transition-colors ${
         isOver && canDrop ? 'bg-red-50 border-red-300' : ''
