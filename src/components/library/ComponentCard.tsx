@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { RackComponent } from '@/types/rack';
 import { useDragComponent } from '@/hooks/useDragAndDrop';
 import { createPlaceholderSVG } from '@/utils/imageLoader';
@@ -16,6 +16,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
   onSelect,
 }) => {
   const { isDragging, drag, preview } = useDragComponent(component);
+  const [imageError, setImageError] = useState(false);
 
   const handleClick = () => {
     onSelect?.(component);
@@ -44,7 +45,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
       }}
       onClick={handleClick}
       className={`
-        relative bg-white border rounded-lg p-3 cursor-pointer transition-all duration-200
+        component-card relative bg-white border rounded-lg p-3 cursor-pointer transition-all duration-200
         hover:shadow-md hover:border-blue-300 active:scale-95
         ${isSelected ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200'}
         ${isDragging ? 'opacity-50 scale-105 rotate-2 shadow-lg' : ''}
@@ -59,20 +60,21 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
 
       {/* Component Image */}
       <div className="flex items-start space-x-3">
-        <div className="w-16 h-10 bg-gray-100 rounded border flex-shrink-0 overflow-hidden">
+        <div className="component-image w-16 h-10 bg-gray-100 rounded border flex-shrink-0 overflow-hidden">
           <img
-            src={component.imageUrl}
+            src={imageError ? placeholderSvg : component.imageUrl}
             alt={component.name}
             className="w-full h-full object-cover"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = placeholderSvg;
+            onError={() => {
+              if (!imageError) {
+                setImageError(true);
+              }
             }}
           />
         </div>
 
         {/* Component Info */}
-        <div className="flex-1 min-w-0">
+        <div className="component-info flex-1 min-w-0">
           <div className="flex items-start justify-between">
             <h3 className="text-sm font-medium text-gray-900 truncate">
               {component.name}
@@ -90,7 +92,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
           </p>
           
           {/* Component Stats */}
-          <div className="flex items-center space-x-3 mt-2 text-xs text-gray-500">
+          <div className="component-stats flex items-center space-x-3 mt-2 text-xs text-gray-500">
             <span className="flex items-center">
               <span className="w-2 h-2 bg-gray-400 rounded mr-1" />
               {component.height}U
@@ -120,7 +122,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
       )}
       
       {/* Quick Info Tooltip on Hover */}
-      <div className="absolute left-full top-0 ml-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+      <div className="component-tooltip absolute left-full top-0 ml-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
         <div className="text-sm font-medium text-gray-900 mb-2">{component.name}</div>
         <div className="space-y-1 text-xs text-gray-600">
           <div>Manufacturer: {component.specifications.manufacturer}</div>

@@ -1,13 +1,14 @@
 import { useState, useCallback } from "react";
 import { RackComponent, SnapPoint } from "@/types/rack";
 import { SnapGuide } from "@/types/design";
+import { calculateSnapPosition } from "@/utils/snapHelpers";
 
 export const useSnapToGrid = (rackHeight: number) => {
   const [snapGuides, setSnapGuides] = useState<SnapGuide[]>([]);
 
   const RACK_UNIT_HEIGHT = 44; // pixels
-  const RACK_WIDTH = 600;
-  const SNAP_THRESHOLD = 10; // pixels
+  // New component area width: total width (720) - ml-14 (56) - mr-6 (24) - px-2 left (8) - px-2 right (8) = 624px
+  const COMPONENT_AREA_WIDTH = 624;
 
   const generateSnapPoints = useCallback((): SnapPoint[] => {
     const points: SnapPoint[] = [];
@@ -23,7 +24,7 @@ export const useSnapToGrid = (rackHeight: number) => {
 
       // Half width positions
       points.push({
-        x: RACK_WIDTH / 2,
+        x: COMPONENT_AREA_WIDTH / 2,
         y: (rackHeight - unit) * RACK_UNIT_HEIGHT,
         rackUnit: unit,
         isOccupied: false,
@@ -35,41 +36,60 @@ export const useSnapToGrid = (rackHeight: number) => {
 
   const snapToGrid = useCallback(
     (
-      mousePosition: { x: number; y: number },
+      mousePosition: { x: number; y: number; rackUnit?: number },
       component: RackComponent
     ): SnapPoint | null => {
-      const snapPoints = generateSnapPoints();
-      const componentHeight = component.height * RACK_UNIT_HEIGHT;
+      // If rackUnit is provided, use it directly (for cleaner rack-unit-based snapping)
+      if (mousePosition.rackUnit !== undefined) {
+        const rackUnit = mousePosition.rackUnit;
+        const snapY = (rackHeight - rackUnit) * RACK_UNIT_HEIGHT;
+        
+        const snapPoint: SnapPoint = {
+          x: 0,
+          y: snapY,
+          rackUnit: rackUnit,
+          isOccupied: false,
+        };
 
-      // Find the closest snap point
-      let closestPoint: SnapPoint | null = null;
-      let minDistance = Infinity;
+        // Update snap guides
+        const componentHeight = component.height * RACK_UNIT_HEIGHT;
+        const componentWidth = component.width === 100 ? COMPONENT_AREA_WIDTH : COMPONENT_AREA_WIDTH / 2;
 
-      snapPoints.forEach((point) => {
-        const distance = Math.sqrt(
-          Math.pow(mousePosition.x - point.x, 2) +
-            Math.pow(mousePosition.y - point.y, 2)
-        );
-
-        if (distance < minDistance && distance <= SNAP_THRESHOLD) {
-          // Check if component fits at this position
-          const wouldFit = point.rackUnit + component.height - 1 <= rackHeight;
-
-          if (wouldFit) {
-            closestPoint = point;
-            minDistance = distance;
-          }
-        }
-      });
-
-      // Update snap guides
-      if (closestPoint) {
         const guides: SnapGuide[] = [
           {
-            x: closestPoint.x,
-            y: closestPoint.y,
-            width: component.width === 100 ? RACK_WIDTH : RACK_WIDTH / 2,
+            x: 0, // SnapGuides component handles positioning
+            y: snapY,
+            width: componentWidth,
             height: componentHeight,
+            rackUnit: rackUnit,
+            visible: true,
+          },
+        ];
+
+        setSnapGuides(guides);
+        return snapPoint;
+      }
+
+      // Fallback to old pixel-based calculation
+      const snapPoint = calculateSnapPosition(
+        mousePosition.x,
+        mousePosition.y,
+        component,
+        rackHeight,
+        []
+      );
+
+      if (snapPoint) {
+        const componentHeight = component.height * RACK_UNIT_HEIGHT;
+        const componentWidth = component.width === 100 ? COMPONENT_AREA_WIDTH : COMPONENT_AREA_WIDTH / 2;
+
+        const guides: SnapGuide[] = [
+          {
+            x: 0,
+            y: snapPoint.y,
+            width: componentWidth,
+            height: componentHeight,
+            rackUnit: snapPoint.rackUnit,
             visible: true,
           },
         ];
@@ -79,9 +99,9 @@ export const useSnapToGrid = (rackHeight: number) => {
         setSnapGuides([]);
       }
 
-      return closestPoint;
+      return snapPoint;
     },
-    [generateSnapPoints, rackHeight]
+    [rackHeight]
   );
 
   const clearSnapGuides = useCallback(() => {

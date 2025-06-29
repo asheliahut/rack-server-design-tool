@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useDrop } from 'react-dnd';
 import { RackComponent, RackPosition } from '@/types/rack';
 import { DragItem } from '@/types/design';
-import RackUnit from './RackUnit';
-import RackGrid from './RackGrid';
-import SnapGuides from '../design/SnapGuides';
-import { useSnapToGrid } from '@/hooks/useSnapToGrid';
+import RackUnit from './RackUnit.js';
+import RackGrid from './RackGrid.js';
+import SnapGuides from '../design/SnapGuides.js';
+import RackComponentItem from './RackComponent.js';
+import { useSnapToGrid } from '@/hooks/useSnapToGrid.js';
+import { calculateSnapPosition } from '@/utils/snapHelpers.js';
 
 interface RackContainerProps {
   components: RackComponent[];
   rackHeight: number;
   onComponentDrop: (component: RackComponent, position: RackPosition) => void;
   onComponentMove: (componentId: string, newPosition: RackPosition) => void;
+  onComponentSelect?: (component: RackComponent) => void;
 }
 
 const RackContainer: React.FC<RackContainerProps> = ({
@@ -19,164 +22,205 @@ const RackContainer: React.FC<RackContainerProps> = ({
   rackHeight,
   onComponentDrop,
   onComponentMove,
+  onComponentSelect,
 }) => {
-  const { snapToGrid, snapGuides } = useSnapToGrid(rackHeight);
+  const { snapToGrid, snapGuides, clearSnapGuides } = useSnapToGrid(rackHeight);
+  const dropRef = useRef<HTMLDivElement>(null);
+  const rackAreaRef = useRef<HTMLDivElement>(null);
 
-  const [{ isOver, draggedItem }, drop] = useDrop({
+  const [{ isOver, draggedItem }, drop] = useDrop<DragItem, void, { isOver: boolean; draggedItem: DragItem | null }>({
     accept: 'component',
     collect: (monitor) => ({
       isOver: monitor.isOver(),
-      draggedItem: monitor.getItem() as DragItem,
+      draggedItem: monitor.getItem(),
     }),
-    hover: (item: DragItem, monitor) => {
+    hover: (item, monitor) => {
       const clientOffset = monitor.getClientOffset();
-      if (clientOffset) {
-        // Update snap guides during hover
-        const rect = (monitor.getDropTarget() as any)?.getBoundingClientRect();
-        if (rect) {
-          const relativeX = clientOffset.x - rect.left;
-          const relativeY = clientOffset.y - rect.top;
-          snapToGrid({ x: relativeX, y: relativeY }, item.component);
+      if (clientOffset && rackAreaRef.current) {
+        // Use the actual rack area for positioning
+        const rackRect = rackAreaRef.current.getBoundingClientRect();
+        const relativeY = clientOffset.y - rackRect.top;
+        
+        // Simple rack unit calculation
+        const rackUnitIndex = Math.floor(relativeY / 44);
+        const snapZoneY = rackUnitIndex * 44;
+        const targetRackUnit = Math.max(1, Math.min(rackHeight, rackHeight - rackUnitIndex));
+        
+        // Check if component would fit within rack bounds
+        const componentEndUnit = targetRackUnit - item.component.height + 1;
+        const fitsInRack = componentEndUnit >= 1; // Component must not extend below unit 1
+        
+        // Use rack-unit-based snapping only if component fits
+        if (fitsInRack) {
+          snapToGrid({ x: 0, y: snapZoneY, rackUnit: targetRackUnit }, item.component);
+        } else {
+          // Clear snap guides if component doesn't fit
+          clearSnapGuides();
         }
       }
     },
-    drop: (item: DragItem, monitor) => {
+    drop: (item, monitor) => {
       const clientOffset = monitor.getClientOffset();
-      const rect = (monitor.getDropTarget() as any)?.getBoundingClientRect();
       
-      if (clientOffset && rect) {
-        const relativeX = clientOffset.x - rect.left;
-        const relativeY = clientOffset.y - rect.top;
+      if (clientOffset && rackAreaRef.current) {
+        // Use the actual rack area for positioning
+        const rackRect = rackAreaRef.current.getBoundingClientRect();
+        const relativeY = clientOffset.y - rackRect.top;
         
-        const snapPoint = snapToGrid({ x: relativeX, y: relativeY }, item.component);
+        // Simple rack unit calculation
+        const rackUnitIndex = Math.floor(relativeY / 44);
+        const targetRackUnit = Math.max(1, Math.min(rackHeight, rackHeight - rackUnitIndex));
         
-        if (snapPoint) {
+        // Check if component would fit within rack bounds
+        const componentEndUnit = targetRackUnit - item.component.height + 1;
+        const fitsInRack = componentEndUnit >= 1; // Component must not extend below unit 1
+        
+        // Check if position is valid (no overlaps with existing components)
+        const noOverlaps = !components.some(existing => {
+          if (!existing.position || existing.id === item.component.id) return false;
+          const existingStart = existing.position.rackUnit;
+          const existingEnd = existing.position.rackUnit - existing.height + 1;
+          const newStart = targetRackUnit;
+          const newEnd = componentEndUnit;
+          
+          // Check for overlap
+          return !(newEnd > existingStart || newStart < existingEnd);
+        });
+        
+        const canPlace = fitsInRack && noOverlaps;
+        
+        if (canPlace) {
           const position: RackPosition = {
-            x: snapPoint.x,
-            y: snapPoint.y,
-            rackUnit: snapPoint.rackUnit,
+            x: 0, // Not needed for relative positioning
+            y: 0, // Not needed for relative positioning  
+            rackUnit: targetRackUnit,
           };
 
           if (item.sourcePosition) {
             // Moving existing component
             onComponentMove(item.component.id, position);
           } else {
-            // Adding new component
-            onComponentDrop(item.component, position);
+            // Adding new component - create a new component with unique ID
+            const newComponent = {
+              ...item.component,
+              id: `${item.component.id}-${Date.now()}`,
+            };
+            onComponentDrop(newComponent, position);
           }
         }
+        
+        // Clear snap guides after drop (successful or not)
+        clearSnapGuides();
       }
     },
   });
 
-  // Calculate rack dimensions
-  const rackWidth = 600; // Standard 19" rack width in pixels
+  // Combine the drop ref with our own ref
+  drop(dropRef);
+
+  // Clear snap guides when drag leaves the area
+  useEffect(() => {
+    if (!isOver && !draggedItem) {
+      clearSnapGuides();
+    }
+  }, [isOver, draggedItem, clearSnapGuides]);
+
+  // Enable scroll wheel during drag by forcing it at the highest level
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (draggedItem) {
+        // Stop event from being captured by React DnD
+        e.stopImmediatePropagation();
+        
+        // Force scroll the page
+        const scrollAmount = e.deltaY;
+        window.scrollTo({
+          top: window.scrollY + scrollAmount,
+          behavior: 'auto'
+        });
+      }
+    };
+
+    if (draggedItem) {
+      // Attach to document with highest priority and prevent other handlers
+      document.addEventListener('wheel', handleWheel, { 
+        passive: false,
+        capture: true 
+      });
+      
+      return () => {
+        document.removeEventListener('wheel', handleWheel, { capture: true });
+      };
+    }
+  }, [draggedItem]);
+
+  // Calculate rack dimensions - made wider with better margins
+  const rackWidth = 720; // Increased width for better component spacing
   const rackHeight_px = rackHeight * 44; // 44px per rack unit
 
   return (
     <div className="relative">
       <div
-        ref={drop}
+        ref={dropRef}
         className={`
-          relative bg-rack-frame border-2 border-gray-600 rounded-lg p-4
-          transition-colors duration-200
-          ${isOver ? 'border-rack-highlight bg-blue-50' : 'border-gray-600'}
+          relative bg-rack-frame rounded-lg p-6
+          transition-colors duration-200 shadow-lg
+          ${isOver ? 'bg-blue-50' : ''}
         `}
         style={{
           width: rackWidth,
-          minHeight: rackHeight_px + 32, // Add padding
+          minHeight: rackHeight_px + 48, // Increased padding
         }}
       >
-        {/* Rack Grid Background */}
-        <RackGrid rackHeight={rackHeight} gridVisible={true} />
-        
         {/* Snap Guides */}
-        <SnapGuides guides={snapGuides} />
+        <SnapGuides guides={snapGuides} rackHeight={rackHeight} />
         
-        {/* Rack Unit Labels and Structure */}
-        <div className="absolute left-0 top-4 w-8 h-full">
+        {/* Rack Unit Labels */}
+        <div className="absolute left-2 top-6 w-10 h-full">
           {Array.from({ length: rackHeight }, (_, index) => {
             const unitNumber = rackHeight - index;
             return (
               <div
                 key={unitNumber}
-                className="h-11 flex items-center justify-center text-xs text-gray-500 border-b border-gray-300"
+                className="h-11 flex items-center justify-center text-xs font-mono text-gray-600 bg-gray-50 border border-gray-300 rounded-sm relative shadow-sm"
+                style={{ height: '44px' }}
               >
-                {unitNumber}
+                <span className="font-bold text-gray-700">{unitNumber}</span>
               </div>
             );
           })}
         </div>
         
         {/* Main rack area */}
-        <div className="ml-8 relative" style={{ width: rackWidth - 32 }}>
-          {/* Render rack units */}
+        <div ref={rackAreaRef} className="ml-14 mr-6 relative overflow-hidden">
+          {/* Rack Grid Background - positioned within this container */}
+          <RackGrid rackHeight={rackHeight} gridVisible={true} />
+          
+          {/* Render rack units - components are now rendered within each unit */}
           {Array.from({ length: rackHeight }, (_, index) => {
             const unitNumber = rackHeight - index;
+            const unitComponents = components.filter(c => {
+              if (!c.position) return false;
+              // Check if component starts at this unit or spans across it
+              const componentStartUnit = c.position.rackUnit;
+              const componentEndUnit = c.position.rackUnit - c.height + 1;
+              return unitNumber <= componentStartUnit && unitNumber >= componentEndUnit;
+            });
+            
             return (
               <RackUnit
                 key={unitNumber}
                 unitNumber={unitNumber}
-                components={components.filter(c => 
-                  c.position?.rackUnit === unitNumber
-                )}
-                onComponentSelect={(component) => {
-                  // Handle component selection if needed
-                }}
+                components={unitComponents}
+                onComponentSelect={onComponentSelect}
               />
             );
           })}
-          
-          {/* Render positioned components */}
-          {components
-            .filter(c => c.position)
-            .map(component => {
-              const position = component.position!;
-              const componentHeight = component.height * 44;
-              const componentWidth = component.width === 100 ? 
-                rackWidth - 32 : (rackWidth - 32) / 2;
-              
-              return (
-                <div
-                  key={component.id}
-                  className="absolute border border-gray-300 rounded bg-white shadow-sm
-                           hover:shadow-md transition-shadow cursor-pointer"
-                  style={{
-                    left: position.x,
-                    top: (rackHeight - position.rackUnit) * 44,
-                    width: componentWidth,
-                    height: componentHeight,
-                    zIndex: 10,
-                  }}
-                >
-                  <div className="p-2 h-full flex items-center">
-                    <img
-                      src={component.imageUrl}
-                      alt={component.name}
-                      className="w-8 h-8 object-contain mr-2 flex-shrink-0"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = '/images/placeholders/generic-placeholder.svg';
-                      }}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-medium text-gray-900 truncate">
-                        {component.name}
-                      </div>
-                      <div className="text-xs text-gray-500 truncate">
-                        {component.specifications.manufacturer} {component.specifications.model}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          }
         </div>
         
         {/* Drop overlay when dragging */}
         {isOver && draggedItem && (
-          <div className="absolute inset-4 border-2 border-dashed border-rack-highlight bg-blue-50 opacity-30 rounded pointer-events-none" />
+          <div className="absolute inset-2 border-2 border-dashed border-blue-400 bg-blue-50 opacity-40 rounded-md pointer-events-none" />
         )}
         
         {/* Rack frame decoration */}

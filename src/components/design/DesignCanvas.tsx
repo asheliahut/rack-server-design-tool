@@ -52,11 +52,12 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
   }, []);
 
   return (
-    <div className="relative w-full h-full bg-gray-100 overflow-hidden">
+    <div id="design-canvas" className="relative w-full h-full bg-gray-100 overflow-hidden">
       {/* Canvas Controls */}
-      <div className="absolute top-4 right-4 z-30 flex items-center space-x-2">
+      <div id="canvas-controls" className="absolute top-4 right-4 z-30 flex items-center space-x-2">
         <div className="bg-white rounded-lg shadow-md border border-gray-200 flex items-center">
           <button
+            id="zoom-out-btn"
             onClick={handleZoomOut}
             className="p-2 hover:bg-gray-100 rounded-l-lg border-r border-gray-200"
             title="Zoom Out"
@@ -69,6 +70,7 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
           </div>
           
           <button
+            id="zoom-in-btn"
             onClick={handleZoomIn}
             className="p-2 hover:bg-gray-100 border-r border-gray-200"
             title="Zoom In"
@@ -77,6 +79,7 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
           </button>
           
           <button
+            id="reset-zoom-btn"
             onClick={handleResetZoom}
             className="p-2 hover:bg-gray-100 rounded-r-lg"
             title="Reset Zoom"
@@ -87,6 +90,7 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
         
         <div className="bg-white rounded-lg shadow-md border border-gray-200 flex items-center">
           <button
+            id="toggle-grid-btn"
             onClick={handleToggleGrid}
             className={`p-2 rounded-l-lg border-r border-gray-200 ${
               showGrid ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'
@@ -97,6 +101,7 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
           </button>
           
           <button
+            id="toggle-labels-btn"
             onClick={handleToggleLabels}
             className={`p-2 rounded-r-lg ${
               showLabels ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'
@@ -109,7 +114,7 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
       </div>
 
       {/* Design Info Panel */}
-      <div className="absolute top-4 left-4 z-30 bg-white rounded-lg shadow-md border border-gray-200 p-3">
+      <div id="design-info-panel" className="absolute top-4 left-4 z-30 bg-white rounded-lg shadow-md border border-gray-200 p-3">
         <h3 className="font-medium text-gray-900 mb-1">{design.name}</h3>
         <div className="text-xs text-gray-600 space-y-0.5">
           <div>Rack Height: {design.rackHeight}U</div>
@@ -127,6 +132,7 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
 
       {/* Canvas */}
       <div 
+        id="canvas-viewport"
         className="absolute inset-0 overflow-auto"
         style={{
           transform: `translate(${canvasPosition.x}px, ${canvasPosition.y}px)`,
@@ -157,6 +163,7 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
               rackHeight={design.rackHeight}
               onComponentDrop={onComponentDrop}
               onComponentMove={onComponentMove}
+              onComponentSelect={onComponentSelect}
             />
           </div>
         </div>
@@ -167,7 +174,7 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
         <DragPreview
           component={item.component}
           isDragging={isDragging}
-          currentOffset={currentOffset}
+          currentOffset={currentOffset ?? undefined}
         />
       )}
 
@@ -180,7 +187,7 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
       />
 
       {/* Keyboard Shortcuts Help */}
-      <div className="absolute bottom-4 left-4 z-30 text-xs text-gray-500 bg-white bg-opacity-90 rounded p-2">
+      <div id="shortcuts-help" className="absolute bottom-4 left-4 z-30 text-xs text-gray-500 bg-white bg-opacity-90 rounded p-2">
         <div className="font-medium mb-1">Shortcuts:</div>
         <div>Drag components from library to rack</div>
         <div>Click components to select/edit</div>

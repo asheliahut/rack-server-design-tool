@@ -10,13 +10,15 @@ import {
   Undo,
   Redo,
   Copy,
-  Palette
+  Palette,
+  Upload
 } from 'lucide-react';
 import Button from './Button';
 
 interface ToolbarProps {
   onSave?: () => void;
   onLoad?: () => void;
+  onLoadFromFile?: (file: File) => void;
   onExport?: () => void;
   onClear?: () => void;
   designName?: string;
@@ -31,6 +33,7 @@ interface ToolbarProps {
 const Toolbar: React.FC<ToolbarProps> = ({
   onSave,
   onLoad,
+  onLoadFromFile,
   onExport,
   onClear,
   designName = 'New Rack Design',
@@ -67,8 +70,17 @@ const Toolbar: React.FC<ToolbarProps> = ({
     }
   };
 
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && onLoadFromFile) {
+      onLoadFromFile(file);
+    }
+    // Reset the input value so the same file can be selected again
+    event.target.value = '';
+  };
+
   return (
-    <div className="h-16 bg-white border-b border-gray-300 flex items-center px-6 shadow-sm">
+    <div id="main-toolbar" className="h-16 bg-white border-b border-gray-300 flex items-center px-6 shadow-sm">
       {/* Left section - App title and design name */}
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-2">
@@ -84,6 +96,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
         <div className="flex items-center space-x-2">
           {isEditingName ? (
             <input
+              id="design-name-input"
               type="text"
               value={tempName}
               onChange={(e) => setTempName(e.target.value)}
@@ -94,6 +107,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
             />
           ) : (
             <button
+              id="design-name-edit-btn"
               onClick={handleNameEdit}
               className="px-2 py-1 text-sm font-medium text-gray-900 hover:bg-gray-100 rounded"
             >
@@ -106,6 +120,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
       {/* Center section - Edit actions */}
       <div className="flex items-center space-x-1 ml-8">
         <Button
+          id="toolbar-undo-btn"
           variant="ghost"
           size="sm"
           onClick={onUndo}
@@ -116,6 +131,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
         </Button>
         
         <Button
+          id="toolbar-redo-btn"
           variant="ghost"
           size="sm"
           onClick={onRedo}
@@ -128,6 +144,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
         <div className="h-6 w-px bg-gray-300 mx-2" />
         
         <Button
+          id="toolbar-duplicate-btn"
           variant="ghost"
           size="sm"
           onClick={onDuplicate}
@@ -137,6 +154,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
         </Button>
         
         <Button
+          id="toolbar-clear-btn"
           variant="ghost"
           size="sm"
           onClick={onClear}
@@ -149,17 +167,46 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
       {/* Right section - File actions */}
       <div className="ml-auto flex items-center space-x-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onLoad}
-          title="Load Design"
-        >
-          <FolderOpen className="w-4 h-4 mr-2" />
-          Load
-        </Button>
+        {/* Load dropdown */}
+        <div className="relative group">
+          <Button
+            id="toolbar-load-btn"
+            variant="ghost"
+            size="sm"
+            title="Load Design"
+          >
+            <FolderOpen className="w-4 h-4 mr-2" />
+            Load
+          </Button>
+          
+          {/* Load dropdown menu */}
+          <div id="load-dropdown-menu" className="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+            <div className="py-1">
+              <button
+                id="load-storage-btn"
+                onClick={() => onLoad?.()}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              >
+                <FolderOpen className="w-4 h-4 mr-2" />
+                Load from Storage
+              </button>
+              <label className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer">
+                <Upload className="w-4 h-4 mr-2" />
+                Load from File
+                <input
+                  id="load-file-input"
+                  type="file"
+                  accept=".json"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          </div>
+        </div>
         
         <Button
+          id="toolbar-save-btn"
           variant="ghost"
           size="sm"
           onClick={onSave}
@@ -172,6 +219,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
         {/* Export dropdown */}
         <div className="relative group">
           <Button
+            id="toolbar-export-btn"
             variant="ghost"
             size="sm"
             onClick={onExport}
@@ -182,9 +230,10 @@ const Toolbar: React.FC<ToolbarProps> = ({
           </Button>
           
           {/* Dropdown menu */}
-          <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+          <div id="export-dropdown-menu" className="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
             <div className="py-1">
               <button
+                id="export-json-btn"
                 onClick={() => onExport?.()}
                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
               >
@@ -192,6 +241,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
                 Export as JSON
               </button>
               <button
+                id="export-pdf-btn"
                 onClick={() => {/* Handle PDF export */}}
                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
               >
@@ -199,6 +249,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
                 Export as PDF
               </button>
               <button
+                id="export-image-btn"
                 onClick={() => {/* Handle image export */}}
                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
               >
@@ -212,6 +263,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
         <div className="h-6 w-px bg-gray-300" />
         
         <Button
+          id="toolbar-share-btn"
           variant="ghost"
           size="sm"
           title="Share Design"
@@ -220,6 +272,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
         </Button>
         
         <Button
+          id="toolbar-settings-btn"
           variant="ghost"
           size="sm"
           title="Settings"

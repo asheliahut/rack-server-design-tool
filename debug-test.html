@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drag & Drop Test - Rack Server Design Tool</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .test-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .debug-info {
+      background: #f0f0f0;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    .issue-list {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    .fix-list {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    h2 {
+      color: #333;
+      margin-top: 0;
+    }
+    ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    li {
+      margin: 5px 0;
+    }
+    .code {
+      background: #f8f9fa;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1>Drag & Drop Functionality Analysis</h1>
+    
+    <div class="debug-info">
+      <h2>🔍 Issues Identified</h2>
+      <ul>
+        <li><strong>Coordinate System Mismatch:</strong> The Y-coordinate calculation was inverted - rack units should start from bottom (Unit 1) to top (Unit 42)</li>
+        <li><strong>Snap Position Calculation:</strong> The mouse position to rack unit conversion needed adjustment</li>
+        <li><strong>Component ID Generation:</strong> New components need unique IDs when dropped</li>
+        <li><strong>Collision Detection:</strong> The overlap checking wasn't properly integrated with the drop handler</li>
+      </ul>
+    </div>
+
+    <div class="fix-list">
+      <h2>✅ Fixes Applied</h2>
+      <ul>
+        <li><strong>Updated Coordinate Calculation:</strong> Fixed <span class="code">calculateSnapPosition</span> to properly convert Y coordinates to rack units</li>
+        <li><strong>Enhanced Drop Handler:</strong> Improved the drop logic in <span class="code">RackContainer</span> to use snap helpers</li>
+        <li><strong>Consistent Snap Logic:</strong> Updated <span class="code">useSnapToGrid</span> to use the same calculation methods</li>
+        <li><strong>Added Debug Logging:</strong> Added console logs to track drag and drop operations</li>
+        <li><strong>Component ID Uniqueness:</strong> Ensured new components get unique IDs when dropped</li>
+      </ul>
+    </div>
+
+    <div class="debug-info">
+      <h2>🛠️ Testing Instructions</h2>
+      <ol>
+        <li>Start the development server: <span class="code">bun run dev</span></li>
+        <li>Open the browser console (F12) to see debug logs</li>
+        <li>Try dragging a component from the library to the rack</li>
+        <li>Check console for debug messages:
+          <ul>
+            <li>"Drag started for component: [name]"</li>
+            <li>"Drop triggered: [component data]"</li>
+            <li>"Calculated snap point: [position data]"</li>
+            <li>"Final position: [x, y, rackUnit]"</li>
+          </ul>
+        </li>
+        <li>Verify the component appears in the correct rack unit</li>
+        <li>Test with both full-width (100%) and half-width (50%) components</li>
+      </ol>
+    </div>
+
+    <div class="debug-info">
+      <h2>📋 Key Files Modified</h2>
+      <ul>
+        <li><span class="code">src/components/rack/RackContainer.tsx</span> - Fixed drop handler coordinate conversion</li>
+        <li><span class="code">src/hooks/useSnapToGrid.ts</span> - Updated to use snap helpers consistently</li>
+        <li><span class="code">src/hooks/useDragAndDrop.ts</span> - Added debug logging</li>
+        <li><span class="code">src/components/library/ComponentCard.tsx</span> - Added debug logging</li>
+        <li><span class="code">src/utils/snapHelpers.ts</span> - Fixed coordinate calculations</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

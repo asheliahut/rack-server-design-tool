@@ -8,16 +8,21 @@ export const useDragComponent = (
 ) => {
   const [{ isDragging }, drag, preview] = useDrag({
     type: "component",
-    item: (): DragItem => ({
-      type: "component",
-      component,
-      sourcePosition,
-    }),
+    item: (): DragItem => {
+      console.log("Drag started for component:", component.name);
+      return {
+        type: "component",
+        component,
+        sourcePosition,
+      };
+    },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
-    end: (item, monitor) => {
+    end: (_item, monitor) => {
+      console.log("Drag ended, didDrop:", monitor.didDrop());
       if (!monitor.didDrop()) {
+        console.log("Drop failed - component snaps back to original position");
         // Handle failed drop - component snaps back to original position
       }
     },
@@ -34,35 +39,40 @@ export const useDropTarget = (
   onDrop: (item: DragItem, position: RackPosition) => void,
   canDrop?: (item: DragItem, position: RackPosition) => boolean
 ) => {
-  const [{ isOver, canDropHere }, drop] = useDrop({
+  const [{ isOver, canDropHere }, drop] = useDrop<
+    DragItem,
+    void,
+    { isOver: boolean; canDropHere: boolean }
+  >({
     accept: "component",
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDropHere: monitor.canDrop(),
     }),
-    canDrop: (item: DragItem, monitor) => {
+    canDrop: (_item, monitor) => {
       if (!canDrop) return true;
 
       const clientOffset = monitor.getClientOffset();
       if (!clientOffset) return false;
 
-      // Convert client offset to rack position
-      const position: RackPosition = {
-        x: clientOffset.x,
-        y: clientOffset.y,
-        rackUnit: Math.floor(clientOffset.y / 44) + 1, // 44px per rack unit
-      };
-
-      return canDrop(item, position);
+      // This will be handled by the specific drop target components
+      // For now, always return true and let the RackContainer handle validation
+      return true;
     },
-    drop: (item: DragItem, monitor) => {
+    drop: (item, monitor) => {
+      // Only handle drops if not already handled by nested drop targets
+      if (monitor.didDrop()) {
+        return;
+      }
+
       const clientOffset = monitor.getClientOffset();
       if (!clientOffset) return;
 
+      // Default position - will be overridden by specific drop targets
       const position: RackPosition = {
         x: clientOffset.x,
         y: clientOffset.y,
-        rackUnit: Math.floor(clientOffset.y / 44) + 1,
+        rackUnit: 1,
       };
 
       onDrop(item, position);

@@ -2,9 +2,9 @@ import { RackComponent, RackPosition, SnapPoint } from "@/types/rack";
 
 export const RACK_CONSTANTS = {
   UNIT_HEIGHT: 44, // Standard rack unit height in pixels
-  RACK_WIDTH: 600, // Total rack width in pixels
-  SNAP_THRESHOLD: 15, // Snap distance threshold in pixels
-  HALF_WIDTH: 300, // Half rack width for dual components
+  RACK_WIDTH: 572, // Updated usable rack width leaving space for rail holes (720 - 56 - 40 - 24 - 8 - 20)
+  SNAP_THRESHOLD: 50, // Increased snap distance threshold in pixels (more forgiving)
+  HALF_WIDTH: 286, // Half rack width for dual components (572 / 2)
 };
 
 export const calculateSnapPosition = (
@@ -14,26 +14,28 @@ export const calculateSnapPosition = (
   rackHeight: number,
   existingComponents: RackComponent[] = []
 ): SnapPoint | null => {
-  const { UNIT_HEIGHT, RACK_WIDTH, SNAP_THRESHOLD, HALF_WIDTH } =
-    RACK_CONSTANTS;
+  const { UNIT_HEIGHT, HALF_WIDTH } = RACK_CONSTANTS;
 
-  // Calculate the rack unit based on Y position
-  const rackUnit = Math.max(
-    1,
-    Math.min(rackHeight, Math.round(mouseY / UNIT_HEIGHT) + 1)
-  );
+  // Calculate the rack unit based on Y position - fix the decremental logic
+  // Y=0 should be the highest rack unit number (top of rack)
+  // As Y increases (going down), rack unit numbers should decrease
+  const rawRackUnit = Math.floor(mouseY / UNIT_HEIGHT);
+  const rackUnit = Math.max(1, Math.min(rackHeight, rackHeight - rawRackUnit));
 
-  // Determine X position (full width or half width)
-  let snapX = 0;
+  // Determine X position (full width or half width) - offset from left rail holes
+  const leftRailOffset = 16; // Space for left rail holes
+  let snapX = leftRailOffset;
   if (component.width === 50) {
     // Half-width component - snap to left or right half
-    snapX = mouseX > HALF_WIDTH ? HALF_WIDTH : 0;
+    snapX = mouseX > (HALF_WIDTH + leftRailOffset) ? (HALF_WIDTH + leftRailOffset) : leftRailOffset;
   } else {
-    // Full-width component - always snap to left edge
-    snapX = 0;
+    // Full-width component - start after left rail holes
+    snapX = leftRailOffset;
   }
 
+  // Calculate Y position - align to the correct rack unit position
   const snapY = (rackHeight - rackUnit) * UNIT_HEIGHT;
+
 
   // Check if this position would cause overlap
   const wouldOverlap = checkForOverlap(
@@ -46,21 +48,13 @@ export const calculateSnapPosition = (
     return null;
   }
 
-  // Check distance to see if we should snap
-  const distance = Math.sqrt(
-    Math.pow(mouseX - snapX, 2) + Math.pow(mouseY - snapY, 2)
-  );
-
-  if (distance <= SNAP_THRESHOLD) {
-    return {
-      x: snapX,
-      y: snapY,
-      rackUnit,
-      isOccupied: false,
-    };
-  }
-
-  return null;
+  // Always return a snap point (simplified for better UX)
+  return {
+    x: snapX,
+    y: snapY,
+    rackUnit,
+    isOccupied: false,
+  };
 };
 
 export const checkForOverlap = (
@@ -69,40 +63,28 @@ export const checkForOverlap = (
   existingComponents: RackComponent[],
   excludeId?: string
 ): boolean => {
-  const componentEndUnit = position.rackUnit + component.height - 1;
+  for (const existing of existingComponents) {
+    if (excludeId && existing.id === excludeId) continue;
+    if (!existing.position) continue;
 
-  return existingComponents.some((existing) => {
-    if (excludeId && existing.id === excludeId) return false;
-    if (!existing.position) return false;
+    // Calculate rack unit ranges - components grow DOWNWARD (decremental)
+    // A 2U component placed "on unit 39" occupies units 39 and 38
+    const newStartUnit = position.rackUnit;
+    const newEndUnit = position.rackUnit - component.height + 1;
+    const existingStartUnit = existing.position.rackUnit;
+    const existingEndUnit = existing.position.rackUnit - existing.height + 1;
 
-    const existingEndUnit = existing.position.rackUnit + existing.height - 1;
-
-    // Check vertical overlap
-    const verticalOverlap = !(
-      componentEndUnit < existing.position.rackUnit ||
-      position.rackUnit > existingEndUnit
-    );
-
-    if (!verticalOverlap) return false;
-
-    // Check horizontal overlap
-    const componentRight =
-      position.x +
-      (component.width === 100
-        ? RACK_CONSTANTS.RACK_WIDTH
-        : RACK_CONSTANTS.HALF_WIDTH);
-    const existingRight =
-      existing.position.x +
-      (existing.width === 100
-        ? RACK_CONSTANTS.RACK_WIDTH
-        : RACK_CONSTANTS.HALF_WIDTH);
-
-    const horizontalOverlap = !(
-      componentRight <= existing.position.x || position.x >= existingRight
-    );
-
-    return horizontalOverlap;
-  });
+    // Check if rack unit ranges overlap
+    // For decremental ranges: [newStartUnit, newEndUnit] and [existingStartUnit, existingEndUnit]
+    // where start > end (e.g., [39, 38] for a 2U component on unit 39)
+    const verticalOverlap = !(newEndUnit > existingStartUnit || newStartUnit < existingEndUnit);
+    
+    if (verticalOverlap) {
+      return true; // Found an overlap in rack units
+    }
+  }
+  
+  return false; // No overlaps found
 };
 
 export const generateAvailablePositions = (
@@ -112,10 +94,12 @@ export const generateAvailablePositions = (
 ): SnapPoint[] => {
   const positions: SnapPoint[] = [];
 
-  for (let unit = 1; unit <= rackHeight - component.height + 1; unit++) {
-    // Full width position
+  // Components grow downward, so we need to ensure they don't go below unit 1
+  for (let unit = component.height; unit <= rackHeight; unit++) {
+    // Full width position - offset from left rail holes
+    const leftRailOffset = 16;
     const fullWidthPos: RackPosition = {
-      x: 0,
+      x: leftRailOffset,
       y: (rackHeight - unit) * RACK_CONSTANTS.UNIT_HEIGHT,
       rackUnit: unit,
     };
@@ -130,13 +114,13 @@ export const generateAvailablePositions = (
     // Half width positions (if component supports it)
     if (component.width === 50) {
       const leftHalfPos: RackPosition = {
-        x: 0,
+        x: leftRailOffset,
         y: (rackHeight - unit) * RACK_CONSTANTS.UNIT_HEIGHT,
         rackUnit: unit,
       };
 
       const rightHalfPos: RackPosition = {
-        x: RACK_CONSTANTS.HALF_WIDTH,
+        x: RACK_CONSTANTS.HALF_WIDTH + leftRailOffset,
         y: (rackHeight - unit) * RACK_CONSTANTS.UNIT_HEIGHT,
         rackUnit: unit,
       };
@@ -200,23 +184,24 @@ export const isValidRackPosition = (
   component: RackComponent,
   rackHeight: number
 ): boolean => {
-  // Check if component fits within rack bounds
+  // Check if component fits within rack bounds (components grow downward)
   if (
-    position.rackUnit < 1 ||
-    position.rackUnit + component.height - 1 > rackHeight
+    position.rackUnit < component.height ||
+    position.rackUnit > rackHeight
   ) {
     return false;
   }
 
-  // Check if X position is valid
-  if (component.width === 100 && position.x !== 0) {
+  // Check if X position is valid - accounting for left rail offset
+  const leftRailOffset = 16;
+  if (component.width === 100 && position.x !== leftRailOffset) {
     return false;
   }
 
   if (
     component.width === 50 &&
-    position.x !== 0 &&
-    position.x !== RACK_CONSTANTS.HALF_WIDTH
+    position.x !== leftRailOffset &&
+    position.x !== RACK_CONSTANTS.HALF_WIDTH + leftRailOffset
   ) {
     return false;
   }

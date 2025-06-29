@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -7,6 +7,7 @@ import RackContainer from '@/components/rack/RackContainer';
 import Toolbar from '@/components/ui/Toolbar';
 import { useRackDesign } from '@/hooks/useRackDesign';
 import { calculateRackStats } from '@/utils/rackCalculations';
+import { createPlaceholderSVG } from '@/utils/imageLoader';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,12 +18,15 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  
   const {
     currentDesign,
     addComponent,
     moveComponent,
     removeComponent,
     clearDesign,
+    loadDesign,
     selectedComponent,
     setSelectedComponent,
   } = useRackDesign();
@@ -42,14 +46,62 @@ function App() {
     if (saved) {
       try {
         const design = JSON.parse(saved);
-        // Load design logic would go here
-        alert('Design loaded successfully!');
+        // Validate the design structure before loading
+        if (design && typeof design === 'object' && 
+            design.id && design.name && design.rackHeight && 
+            Array.isArray(design.components)) {
+          // Convert date strings back to Date objects
+          const loadedDesign = {
+            ...design,
+            createdAt: new Date(design.createdAt),
+            updatedAt: new Date(design.updatedAt),
+          };
+          loadDesign(loadedDesign);
+          alert('Design loaded successfully!');
+        } else {
+          alert('Invalid design format');
+        }
       } catch (error) {
         alert('Error loading design');
       }
     } else {
       alert('No saved design found');
     }
+  };
+
+  const handleLoadFromFile = (file: File) => {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const design = JSON.parse(content);
+        
+        // Validate that it's a proper design file
+        if (design && typeof design === 'object' && 
+            design.id && design.name && design.rackHeight && 
+            Array.isArray(design.components)) {
+          // Convert date strings back to Date objects
+          const loadedDesign = {
+            ...design,
+            createdAt: new Date(design.createdAt),
+            updatedAt: new Date(design.updatedAt),
+          };
+          loadDesign(loadedDesign);
+          alert(`Design "${loadedDesign.name}" loaded successfully from file!`);
+        } else {
+          alert('Invalid design file format. Please select a valid exported JSON file.');
+        }
+      } catch (error) {
+        alert('Error reading file. Please ensure it\'s a valid JSON file.');
+      }
+    };
+    
+    reader.onerror = () => {
+      alert('Error reading file.');
+    };
+    
+    reader.readAsText(file);
   };
 
   const handleExport = () => {
@@ -78,28 +130,30 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <DndProvider backend={HTML5Backend}>
-        <div className="h-screen flex flex-col bg-gray-50">
+        <div id="app-root" className="h-screen flex flex-col bg-gray-50">
           {/* Toolbar */}
           <Toolbar
             onSave={handleSave}
             onLoad={handleLoad}
+            onLoadFromFile={handleLoadFromFile}
             onExport={handleExport}
             onClear={clearDesign}
             designName={currentDesign?.name}
           />
           
-          <div className="flex-1 flex overflow-hidden">
+          <div id="main-layout" className="flex-1 flex overflow-hidden">
             {/* Component Library Sidebar */}
             <ComponentLibrary 
               onComponentSelect={setSelectedComponent}
+              onComponentRemove={removeComponent}
               selectedCategory="server"
             />
             
             {/* Main Design Area */}
-            <div className="flex-1 flex flex-col">
+            <div id="design-area" className="flex-1 flex flex-col">
               {/* Stats Panel */}
               {rackStats && (
-                <div className="bg-white border-b border-gray-200 p-4">
+                <div id="stats-panel" className="bg-white border-b border-gray-200 p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex gap-6 text-sm">
                       <span className="font-medium">
@@ -123,7 +177,7 @@ function App() {
               )}
               
               {/* Design Canvas */}
-              <div className="flex-1 overflow-auto">
+              <div id="canvas-container" className="flex-1 overflow-auto">
                 <div className="p-8 min-h-full flex justify-center items-start">
                   <div className="bg-white rounded-lg shadow-lg p-6">
                     <div className="mb-4">
@@ -140,6 +194,7 @@ function App() {
                       rackHeight={currentDesign?.rackHeight || 42}
                       onComponentDrop={addComponent}
                       onComponentMove={moveComponent}
+                      onComponentSelect={setSelectedComponent}
                     />
                   </div>
                 </div>
@@ -148,18 +203,21 @@ function App() {
             
             {/* Properties Panel */}
             {selectedComponent && (
-              <div className="w-80 bg-white border-l border-gray-200 p-4">
+              <div id="properties-panel" className="w-80 bg-white border-l border-gray-200 p-4">
                 <h3 className="text-lg font-semibold mb-4">Component Details</h3>
                 
                 <div className="space-y-4">
                   <div>
                     <img
-                      src={selectedComponent.imageUrl}
+                      src={
+                        imageErrors.has(selectedComponent.imageUrl)
+                          ? createPlaceholderSVG(256, 128, selectedComponent.name, selectedComponent.category)
+                          : selectedComponent.imageUrl
+                      }
                       alt={selectedComponent.name}
                       className="w-full h-32 object-cover rounded-lg bg-gray-100"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = '/images/placeholders/generic-placeholder.svg';
+                      onError={() => {
+                        setImageErrors(prev => new Set(prev).add(selectedComponent.imageUrl));
                       }}
                     />
                   </div>
@@ -225,6 +283,7 @@ function App() {
                   )}
                   
                   <button
+                    id="remove-component-btn"
                     onClick={() => {
                       if (selectedComponent.id) {
                         removeComponent(selectedComponent.id);

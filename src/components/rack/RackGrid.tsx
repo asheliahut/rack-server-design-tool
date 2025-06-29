@@ -13,18 +13,37 @@ const RackGrid: React.FC<RackGridProps> = ({
 }) => {
   if (!gridVisible) return null;
 
-  const rackWidth = 568; // 600 - 32px padding
+  const rackWidth = 572; // Updated usable rack width leaving space for rail holes (720 - 56 - 40 - 24 - 8 - 20)
   const unitHeight = 44;
 
   return (
-    <div className="absolute inset-4 pointer-events-none">
+    <div 
+      className="absolute pointer-events-none inset-0"
+    >
       {/* Horizontal grid lines for each rack unit */}
       {Array.from({ length: rackHeight + 1 }, (_, index) => (
         <div
           key={`h-${index}`}
-          className="absolute w-full border-t border-gray-200"
+          className="absolute border-t"
           style={{
             top: index * unitHeight,
+            width: rackWidth, // Use explicit width instead of w-full
+            borderColor: index === 0 ? '#374151' : '#e5e7eb', // darker only for top
+            borderWidth: index === 0 ? '2px' : '1px',
+          }}
+        />
+      ))}
+      
+      {/* Rack unit zones - subtle background for each unit */}
+      {Array.from({ length: rackHeight }, (_, index) => (
+        <div
+          key={`zone-${index}`}
+          className="absolute hover:bg-blue-50 transition-colors duration-150"
+          style={{
+            top: index * unitHeight,
+            width: rackWidth, // Use explicit width instead of w-full
+            height: unitHeight,
+            backgroundColor: index % 2 === 0 ? 'rgba(249, 250, 251, 0.5)' : 'transparent',
           }}
         />
       ))}
@@ -32,7 +51,7 @@ const RackGrid: React.FC<RackGridProps> = ({
       {/* Vertical grid lines for half-rack divisions */}
       <div className="absolute h-full border-l border-gray-200" style={{ left: 0 }} />
       <div className="absolute h-full border-l border-gray-100" style={{ left: rackWidth / 2 }} />
-      <div className="absolute h-full border-l border-gray-200" style={{ left: rackWidth }} />
+      {/* Right border is provided by the rack frame itself */}
       
       {/* Quarter divisions (subtle) */}
       <div className="absolute h-full border-l border-gray-100 opacity-50" style={{ left: rackWidth / 4 }} />
@@ -50,76 +69,6 @@ const RackGrid: React.FC<RackGridProps> = ({
         />
       ))}
       
-      {/* Rack unit labels overlay */}
-      <div className="absolute -left-6 top-0 w-6 h-full">
-        {Array.from({ length: rackHeight }, (_, index) => {
-          const unitNumber = rackHeight - index;
-          return (
-            <div
-              key={unitNumber}
-              className="h-11 flex items-center justify-center text-xs text-gray-500 font-mono"
-              style={{ height: unitHeight }}
-            >
-              {unitNumber}
-            </div>
-          );
-        })}
-      </div>
-      
-      {/* Visual rack mounting rails */}
-      <div className="absolute left-0 top-0 w-1 h-full bg-gray-300"></div>
-      <div className="absolute right-0 top-0 w-1 h-full bg-gray-300"></div>
-      
-      {/* Mounting hole pattern */}
-      {Array.from({ length: rackHeight }, (_, index) => (
-        <React.Fragment key={`holes-${index}`}>
-          {/* Left rail holes */}
-          <div
-            className="absolute w-1 h-1 bg-gray-500 rounded-full"
-            style={{
-              left: -2,
-              top: index * unitHeight + 8,
-            }}
-          />
-          <div
-            className="absolute w-1 h-1 bg-gray-500 rounded-full"
-            style={{
-              left: -2,
-              top: index * unitHeight + 22,
-            }}
-          />
-          <div
-            className="absolute w-1 h-1 bg-gray-500 rounded-full"
-            style={{
-              left: -2,
-              top: index * unitHeight + 36,
-            }}
-          />
-          
-          {/* Right rail holes */}
-          <div
-            className="absolute w-1 h-1 bg-gray-500 rounded-full"
-            style={{
-              right: -2,
-              top: index * unitHeight + 8,
-            }}
-          />
-          <div
-            className="absolute w-1 h-1 bg-gray-500 rounded-full"
-            style={{
-              right: -2,
-              top: index * unitHeight + 22,
-            }}
-          />
-          <div
-            className="absolute w-1 h-1 bg-gray-500 rounded-full"
-            style={{
-              right: -2,
-              top: index * unitHeight + 36,
-            }}
-          />
-        </React.Fragment>
-      ))}
     </div>
   );
 };

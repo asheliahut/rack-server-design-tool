@@ -1,23 +1,26 @@
 import React, { useState } from 'react';
+import { useDrop } from 'react-dnd';
 import { ComponentCategory, RackComponent } from '@/types/rack';
-import ComponentCard from './ComponentCard';
+import { DragItem } from '@/types/design';
+import ComponentCard from './ComponentCard.js';
 import { 
-  allComponents,
   serverComponents,
   storageComponents,
   networkComponents,
   powerComponents,
   accessoryComponents,
 } from '@/data/serverComponents';
-import { Search, Server, HardDrive, Wifi, Zap, Tool, Square } from 'lucide-react';
+import { Search, Server, HardDrive, Wifi, Zap, Wrench, Square } from 'lucide-react';
 
 interface ComponentLibraryProps {
   onComponentSelect?: (component: RackComponent) => void;
+  onComponentRemove?: (componentId: string) => void;
   selectedCategory?: string;
 }
 
 const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
   onComponentSelect,
+  onComponentRemove,
   selectedCategory: initialCategory = 'server',
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<ComponentCategory>(
@@ -25,6 +28,21 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
   );
   const [searchTerm, setSearchTerm] = useState('');
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  // Set up drop area for removing components
+  const [{ isOver, canDrop }, drop] = useDrop<DragItem, void, { isOver: boolean; canDrop: boolean }>({
+    accept: 'component',
+    drop: (item, monitor) => {
+      // Only remove if the item has a sourcePosition (meaning it's from the rack)
+      if (item.sourcePosition && onComponentRemove) {
+        onComponentRemove(item.component.id);
+      }
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop() && monitor.getItem()?.sourcePosition !== undefined,
+    }),
+  });
 
   const getComponentsByCategory = (category: ComponentCategory): RackComponent[] => {
     switch (category) {
@@ -56,15 +74,16 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
     { id: 'storage', name: 'Storage', icon: HardDrive, color: 'text-green-600' },
     { id: 'network', name: 'Network', icon: Wifi, color: 'text-orange-600' },
     { id: 'power', name: 'Power', icon: Zap, color: 'text-purple-600' },
-    { id: 'cooling', name: 'Cooling', icon: Tool, color: 'text-cyan-600' },
-    { id: 'management', name: 'Management', icon: Tool, color: 'text-gray-600' },
+    { id: 'cooling', name: 'Cooling', icon: Wrench, color: 'text-cyan-600' },
+    { id: 'management', name: 'Management', icon: Wrench, color: 'text-gray-600' },
     { id: 'blank', name: 'Blank Panels', icon: Square, color: 'text-gray-500' },
   ] as const;
 
   if (isCollapsed) {
     return (
-      <div className="w-12 bg-white border-r border-gray-300 flex flex-col items-center py-4">
+      <div id="library-collapsed" className="w-12 bg-white border-r border-gray-300 flex flex-col items-center py-4">
         <button
+          id="library-expand-btn"
           onClick={() => setIsCollapsed(false)}
           className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded"
           title="Expand Component Library"
@@ -76,12 +95,28 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
   }
 
   return (
-    <div className="w-80 bg-white border-r border-gray-300 flex flex-col">
+    <div 
+      ref={drop}
+      id="component-library" 
+      className={`w-80 bg-white border-r border-gray-300 flex flex-col transition-colors ${
+        isOver && canDrop ? 'bg-red-50 border-red-300' : ''
+      }`}
+    >
+      {/* Drop Zone Indicator */}
+      {isOver && canDrop && (
+        <div className="bg-red-100 border-b-2 border-red-400 p-3 text-center">
+          <div className="text-red-700 font-medium text-sm">
+            🗑️ Drop here to remove component
+          </div>
+        </div>
+      )}
+      
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold text-gray-900">Components</h2>
           <button
+            id="library-collapse-btn"
             onClick={() => setIsCollapsed(true)}
             className="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded"
             title="Collapse Component Library"
@@ -94,6 +129,7 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
+            id="component-search-input"
             type="text"
             placeholder="Search components..."
             value={searchTerm}
@@ -104,7 +140,7 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
       </div>
       
       {/* Category Tabs */}
-      <div className="border-b border-gray-200">
+      <div id="category-tabs" className="border-b border-gray-200">
         <div className="flex flex-wrap gap-1 p-3">
           {categories.map(category => {
             const Icon = category.icon;
@@ -113,6 +149,7 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
             return (
               <button
                 key={category.id}
+                id={`category-${category.id}-btn`}
                 onClick={() => setSelectedCategory(category.id as ComponentCategory)}
                 className={`
                   flex items-center px-3 py-2 text-xs rounded-lg transition-colors
@@ -131,7 +168,7 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
       </div>
       
       {/* Component Count */}
-      <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
+      <div id="component-count" className="px-4 py-2 bg-gray-50 border-b border-gray-200">
         <span className="text-xs text-gray-600">
           {filteredComponents.length} {filteredComponents.length === 1 ? 'component' : 'components'}
           {searchTerm && ` matching "${searchTerm}"`}
@@ -139,7 +176,7 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
       </div>
       
       {/* Component List */}
-      <div className="flex-1 overflow-y-auto">
+      <div id="component-list" className="flex-1 overflow-y-auto">
         {filteredComponents.length === 0 ? (
           <div className="p-8 text-center">
             <div className="text-gray-400 mb-2">
@@ -150,6 +187,7 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
             </p>
             {searchTerm && (
               <button
+                id="clear-search-btn"
                 onClick={() => setSearchTerm('')}
                 className="mt-2 text-blue-600 hover:text-blue-800 text-sm"
               >

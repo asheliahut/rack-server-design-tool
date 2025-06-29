@@ -52,7 +52,7 @@ const Panel: React.FC<PanelProps> = ({
     <div className={panelClasses}>
       {/* Panel Header */}
       {(title || collapsible || closable) && (
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+        <div className="panel-header flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
           <div className="flex items-center space-x-3">
             {title && (
               <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
@@ -62,8 +62,8 @@ const Panel: React.FC<PanelProps> = ({
           <div className="flex items-center space-x-1">
             {collapsible && (
               <button
+                className="panel-collapse-btn p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded"
                 onClick={onToggleCollapse}
-                className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded"
                 title={collapsed ? 'Expand Panel' : 'Collapse Panel'}
               >
                 {collapsed ? (
@@ -76,8 +76,8 @@ const Panel: React.FC<PanelProps> = ({
             
             {closable && (
               <button
+                className="panel-close-btn p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded"
                 onClick={onClose}
-                className="p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded"
                 title="Close Panel"
               >
                 <X className="w-4 h-4" />
@@ -89,14 +89,14 @@ const Panel: React.FC<PanelProps> = ({
       
       {/* Panel Content */}
       {!collapsed && (
-        <div className="flex-1 overflow-auto">
+        <div className="panel-content flex-1 overflow-auto">
           {children}
         </div>
       )}
       
       {/* Collapsed state indicator */}
       {collapsed && (
-        <div className="p-4 text-center text-gray-500">
+        <div className="panel-collapsed p-4 text-center text-gray-500">
           <Minus className="w-6 h-6 mx-auto mb-2" />
           <p className="text-xs">Panel collapsed</p>
         </div>

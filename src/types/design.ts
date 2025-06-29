@@ -17,6 +17,7 @@ export interface SnapGuide {
   width: number;
   height: number;
   visible: boolean;
+  rackUnit?: number;
 }
 
 export interface DesignState {
