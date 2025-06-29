@@ -4,12 +4,12 @@ import { DragItem } from "@/types/design";
 
 export const useDragComponent = (
   component: RackComponent,
-  sourcePosition?: RackPosition
+  sourcePosition?: RackPosition,
+  onSnapBack?: () => void
 ) => {
   const [{ isDragging }, drag, preview] = useDrag({
     type: "component",
     item: (): DragItem => {
-      console.log("Drag started for component:", component.name);
       return {
         type: "component",
         component,
@@ -20,10 +20,11 @@ export const useDragComponent = (
       isDragging: monitor.isDragging(),
     }),
     end: (_item, monitor) => {
-      console.log("Drag ended, didDrop:", monitor.didDrop());
       if (!monitor.didDrop()) {
-        console.log("Drop failed - component snaps back to original position");
         // Handle failed drop - component snaps back to original position
+        if (onSnapBack) {
+          onSnapBack();
+        }
       }
     },
   });
@@ -90,9 +91,10 @@ export const useDragAndDrop = (
   component: RackComponent,
   sourcePosition?: RackPosition,
   onDrop?: (item: DragItem, position: RackPosition) => void,
-  canDrop?: (item: DragItem, position: RackPosition) => boolean
+  canDrop?: (item: DragItem, position: RackPosition) => boolean,
+  onSnapBack?: () => void
 ) => {
-  const dragProps = useDragComponent(component, sourcePosition);
+  const dragProps = useDragComponent(component, sourcePosition, onSnapBack);
   const dropProps = onDrop ? useDropTarget(onDrop, canDrop) : null;
 
   return {

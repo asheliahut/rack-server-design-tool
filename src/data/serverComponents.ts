@@ -827,22 +827,6 @@ export const accessoryComponents: RackComponent[] = [
       weight: "2.5kg",
     },
   },
-  {
-    id: "pdu-vertical",
-    name: "Vertical PDU",
-    category: "power",
-    height: 42, // Full height
-    width: 10, // Takes up side space
-    depth: 1,
-    imageUrl: "/images/accessories/pdu-vertical.jpg",
-    specifications: {
-      manufacturer: "APC",
-      model: "AP8858",
-      power: "30A 208V",
-      ports: 24,
-      weight: "8.2kg",
-    },
-  },
 ];
 
 // Combined exports for easy importing

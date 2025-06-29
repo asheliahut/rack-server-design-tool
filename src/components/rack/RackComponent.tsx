@@ -12,8 +12,24 @@ const RackComponent: React.FC<RackComponentProps> = ({
   component,
   onSelect,
 }) => {
-  const { isDragging, drag, preview } = useDragComponent(component, component.position);
+  // Track position in local state for snap-back
+  const [position, setPosition] = useState(component.position);
   const [imageError, setImageError] = useState(false);
+
+  // Snap back to original position if drop fails
+  const handleSnapBack = () => {
+    setPosition(component.position);
+  };
+
+  // Optionally, you may want to update position on successful drop (if needed)
+  // This is just a placeholder for integration with your drop logic
+  // const handleDrop = (_item, newPosition) => setPosition(newPosition);
+
+  const { isDragging, drag, preview } = useDragComponent(
+    { ...component, position },
+    position,
+    handleSnapBack
+  );
 
   const handleClick = () => {
     onSelect?.(component);
@@ -35,6 +51,9 @@ const RackComponent: React.FC<RackComponentProps> = ({
       `}
       style={{
         zIndex: isDragging ? 20 : 10,
+        left: position?.x,
+        top: position?.y,
+        position: 'absolute',
       }}
     >
       <div className="p-2 h-full flex items-center">
