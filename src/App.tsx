@@ -17,9 +17,10 @@ const queryClient = new QueryClient({
   },
 });
 
+
 function App() {
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
-  
+
   const {
     currentDesign,
     addComponent,
@@ -29,7 +30,42 @@ function App() {
     loadDesign,
     selectedComponent,
     setSelectedComponent,
+    updateComponent,
+    // We'll add a setter for rackHeight below
   } = useRackDesign();
+
+  const [pendingRackHeight, setPendingRackHeight] = useState<number>(currentDesign?.rackHeight || 42);
+
+  // Keep pendingRackHeight in sync with currentDesign.rackHeight (e.g. after load)
+  // This ensures the input field updates when a design is loaded
+  if (pendingRackHeight !== currentDesign?.rackHeight) {
+    setPendingRackHeight(currentDesign?.rackHeight || 42);
+  }
+
+  // Helper to update rack height in the design
+  const handleRackHeightChange = (newHeight: number) => {
+    if (!currentDesign) return;
+    // Clamp between 1 and 55
+    const clamped = Math.max(1, Math.min(55, newHeight));
+    setPendingRackHeight(clamped);
+    // Only update if different
+    if (clamped !== currentDesign.rackHeight) {
+      // Remove components that would be out of bounds
+      const filteredComponents = currentDesign.components.filter(
+        c => !c.position || (c.position.rackUnit <= clamped && (c.position.rackUnit - c.height + 1) >= 1)
+      );
+      updateComponent('__RACK_HEIGHT__', { 
+        // This is a hack, see below for actual update
+      });
+      // Actually update the design
+      loadDesign({
+        ...currentDesign,
+        rackHeight: clamped,
+        components: filteredComponents,
+        updatedAt: new Date(),
+      });
+    }
+  };
 
   const rackStats = currentDesign ? calculateRackStats(currentDesign) : null;
 
@@ -139,6 +175,15 @@ function App() {
             onExport={handleExport}
             onClear={clearDesign}
             designName={currentDesign?.name}
+            onDesignNameChange={name => {
+              if (currentDesign) {
+                loadDesign({
+                  ...currentDesign,
+                  name,
+                  updatedAt: new Date(),
+                });
+              }
+            }}
           />
           
           <div id="main-layout" className="flex-1 flex overflow-hidden">
@@ -180,14 +225,40 @@ function App() {
               <div id="canvas-container" className="flex-1 overflow-auto">
                 <div className="p-8 min-h-full flex justify-center items-start">
                   <div className="bg-white rounded-lg shadow-lg p-6">
-                    <div className="mb-4">
-                      <h2 className="text-lg font-semibold text-gray-800">
-                        {currentDesign?.name || 'New Rack Design'}
-                      </h2>
-                      <p className="text-sm text-gray-600">
-                        {currentDesign?.rackHeight}U Standard Rack
-                      </p>
-                    </div>
+                <div className="mb-4">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={currentDesign?.name || ''}
+                      onChange={e => {
+                        if (currentDesign) {
+                          loadDesign({
+                            ...currentDesign,
+                            name: e.target.value,
+                            updatedAt: new Date(),
+                          });
+                        }
+                      }}
+                      className="text-lg font-semibold text-gray-800 bg-transparent border-b border-gray-300 focus:outline-none focus:border-blue-400 transition-colors w-full"
+                      style={{ minWidth: 120 }}
+                      aria-label="Design Name"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <label htmlFor="rack-height-input" className="text-sm text-gray-600 font-medium">Rack Height:</label>
+                    <input
+                      id="rack-height-input"
+                      type="number"
+                      min={1}
+                      max={55}
+                      value={pendingRackHeight}
+                      onChange={e => handleRackHeightChange(Number(e.target.value))}
+                      className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      style={{ width: 60 }}
+                    />
+                    <span className="text-sm text-gray-600">U</span>
+                  </div>
+                </div>
                     
                     <RackContainer
                       components={currentDesign?.components || []}
@@ -203,9 +274,18 @@ function App() {
             
             {/* Properties Panel */}
             {selectedComponent && (
-              <div id="properties-panel" className="w-80 bg-white border-l border-gray-200 p-4">
+              <div id="properties-panel" className="w-80 bg-white border-l border-gray-200 p-4 relative">
+                <button
+                  className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 focus:outline-none"
+                  title="Close"
+                  aria-label="Close details panel"
+                  onClick={() => setSelectedComponent(null)}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
                 <h3 className="text-lg font-semibold mb-4">Component Details</h3>
-                
                 <div className="space-y-4">
                   <div>
                     <img
@@ -221,12 +301,10 @@ function App() {
                       }}
                     />
                   </div>
-                  
                   <div>
                     <h4 className="font-medium text-gray-900">{selectedComponent.name}</h4>
                     <p className="text-sm text-gray-600 capitalize">{selectedComponent.category}</p>
                   </div>
-                  
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>
                       <span className="text-gray-600">Height:</span>
@@ -237,7 +315,6 @@ function App() {
                       <span className="ml-1 font-medium">{selectedComponent.width}%</span>
                     </div>
                   </div>
-                  
                   <div className="border-t pt-4">
                     <h5 className="font-medium text-gray-900 mb-2">Specifications</h5>
                     <div className="space-y-1 text-sm">
@@ -269,7 +346,6 @@ function App() {
                       )}
                     </div>
                   </div>
-                  
                   {selectedComponent.position && (
                     <div className="border-t pt-4">
                       <h5 className="font-medium text-gray-900 mb-2">Position</h5>
@@ -281,7 +357,6 @@ function App() {
                       </div>
                     </div>
                   )}
-                  
                   <button
                     id="remove-component-btn"
                     onClick={() => {
