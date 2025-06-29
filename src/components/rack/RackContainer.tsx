@@ -5,9 +5,7 @@ import { DragItem } from '@/types/design';
 import RackUnit from './RackUnit.js';
 import RackGrid from './RackGrid.js';
 import SnapGuides from '../design/SnapGuides.js';
-import RackComponentItem from './RackComponent.js';
 import { useSnapToGrid } from '@/hooks/useSnapToGrid.js';
-import { calculateSnapPosition } from '@/utils/snapHelpers.js';
 
 interface RackContainerProps {
   components: RackComponent[];
