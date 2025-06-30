@@ -92,22 +92,22 @@ const SinglePortModal: React.FC<SinglePortModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div 
-        className="bg-white rounded-lg shadow-xl max-w-md w-full"
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full"
         onKeyDown={handleKeyDown}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               Port {portNumber}
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               {component.customName || component.name}
             </p>
           </div>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 focus:outline-none"
+            className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 focus:outline-none"
             title="Close"
           >
             <X className="w-5 h-5" />
@@ -121,7 +121,7 @@ const SinglePortModal: React.FC<SinglePortModalProps> = ({
             <div className={`w-3 h-3 rounded-full ${
               isLabeled ? 'bg-green-500' : 'bg-gray-300'
             }`} />
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 dark:text-gray-400">
               {isLabeled ? 'Port is labeled' : 'Port is unlabeled'}
             </span>
           </div>
@@ -165,22 +165,22 @@ const SinglePortModal: React.FC<SinglePortModalProps> = ({
 
           {/* Change Indicator */}
           {hasChanges && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3">
               <div className="flex items-center">
-                <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2" />
-                <span className="text-sm text-yellow-800">Unsaved changes</span>
+                <div className="w-2 h-2 bg-yellow-400 dark:bg-yellow-500 rounded-full mr-2" />
+                <span className="text-sm text-yellow-800 dark:text-yellow-200">Unsaved changes</span>
               </div>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-4 border-t border-gray-200">
+        <div className="flex items-center justify-between p-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex space-x-2">
             {(label.trim() || description.trim()) && (
               <button
                 onClick={handleClear}
-                className="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:bg-gray-50"
+                className="flex items-center px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
                 title="Clear all fields"
               >
                 <Trash2 className="w-4 h-4 mr-1" />
@@ -192,7 +192,7 @@ const SinglePortModal: React.FC<SinglePortModalProps> = ({
           <div className="flex space-x-2">
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:bg-gray-50"
+              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Cancel
             </button>
@@ -201,8 +201,8 @@ const SinglePortModal: React.FC<SinglePortModalProps> = ({
               disabled={!hasChanges}
               className={`flex items-center px-4 py-2 text-sm rounded ${
                 hasChanges
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+                  : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
               }`}
             >
               <Save className="w-4 h-4 mr-1" />
@@ -213,7 +213,7 @@ const SinglePortModal: React.FC<SinglePortModalProps> = ({
 
         {/* Keyboard Shortcuts Hint */}
         <div className="px-4 pb-2">
-          <p className="text-xs text-gray-400 text-center">
+          <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
             Press Ctrl+Enter to save, Esc to close
           </p>
         </div>

@@ -133,7 +133,7 @@ const DesignCanvas: React.FC<DesignCanvasProps> = ({
       {/* Canvas */}
       <div 
         id="canvas-viewport"
-        className="absolute inset-0 overflow-auto"
+        className="absolute inset-0 overflow-auto scrollbar-thin"
         style={{
           transform: `translate(${canvasPosition.x}px, ${canvasPosition.y}px)`,
         }}

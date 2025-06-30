@@ -5,11 +5,6 @@ import {
   Download, 
   Trash2, 
   FileText, 
-  Share2, 
-  Settings,
-  Undo,
-  Redo,
-  Copy,
   Palette,
   Upload,
   Sun,
@@ -26,11 +21,6 @@ interface ToolbarProps {
   onClear?: () => void;
   designName?: string;
   onDesignNameChange?: (name: string) => void;
-  canUndo?: boolean;
-  canRedo?: boolean;
-  onUndo?: () => void;
-  onRedo?: () => void;
-  onDuplicate?: () => void;
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
@@ -41,11 +31,6 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onClear,
   designName = 'New Rack Design',
   onDesignNameChange,
-  canUndo = false,
-  canRedo = false,
-  onUndo,
-  onRedo,
-  onDuplicate,
 }) => {
   const { theme, toggleTheme } = useTheme();
   const [isEditingName, setIsEditingName] = useState(false);
@@ -123,39 +108,6 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
       {/* Center section - Edit actions */}
       <div className="flex items-center space-x-1 ml-8">
-        <Button
-          id="toolbar-undo-btn"
-          variant="ghost"
-          size="sm"
-          onClick={onUndo}
-          disabled={!canUndo}
-          title="Undo (Ctrl+Z)"
-        >
-          <Undo className="w-4 h-4" />
-        </Button>
-        
-        <Button
-          id="toolbar-redo-btn"
-          variant="ghost"
-          size="sm"
-          onClick={onRedo}
-          disabled={!canRedo}
-          title="Redo (Ctrl+Y)"
-        >
-          <Redo className="w-4 h-4" />
-        </Button>
-        
-        <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-2" />
-        
-        <Button
-          id="toolbar-duplicate-btn"
-          variant="ghost"
-          size="sm"
-          onClick={onDuplicate}
-          title="Duplicate Design"
-        >
-          <Copy className="w-4 h-4" />
-        </Button>
         
         <Button
           id="toolbar-clear-btn"
@@ -267,15 +219,6 @@ const Toolbar: React.FC<ToolbarProps> = ({
         <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
         
         <Button
-          id="toolbar-share-btn"
-          variant="ghost"
-          size="sm"
-          title="Share Design"
-        >
-          <Share2 className="w-4 h-4" />
-        </Button>
-        
-        <Button
           id="toolbar-theme-toggle-btn"
           variant="ghost"
           size="sm"
@@ -287,15 +230,6 @@ const Toolbar: React.FC<ToolbarProps> = ({
           ) : (
             <Sun className="w-4 h-4" />
           )}
-        </Button>
-        
-        <Button
-          id="toolbar-settings-btn"
-          variant="ghost"
-          size="sm"
-          title="Settings"
-        >
-          <Settings className="w-4 h-4" />
         </Button>
       </div>
     </div>

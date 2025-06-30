@@ -177,7 +177,7 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
       </div>
       
       {/* Component List */}
-      <div id="component-list" className="flex-1 overflow-y-auto overflow-x-hidden">
+      <div id="component-list" className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin">
         {filteredComponents.length === 0 ? (
           <div className="p-8 text-center">
             <div className="text-gray-400 mb-2">

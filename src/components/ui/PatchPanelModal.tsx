@@ -77,20 +77,20 @@ const PatchPanelModal: React.FC<PatchPanelModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
               Port Labeling - {component.customName || component.name}
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               {totalPorts} ports • {component.specifications.manufacturer} {component.specifications.model}
             </p>
           </div>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 focus:outline-none"
+            className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 focus:outline-none"
             title="Close"
           >
             <X className="w-6 h-6" />
@@ -100,20 +100,20 @@ const PatchPanelModal: React.FC<PatchPanelModalProps> = ({
         {/* Content */}
         <div className="flex-1 overflow-hidden flex flex-col">
           {/* Toolbar */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
                 {portLabels.filter(pl => pl.label.trim() !== '').length} of {totalPorts} ports labeled
               </span>
               {hasChanges && (
-                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                <span className="text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">
                   Unsaved changes
                 </span>
               )}
             </div>
             <button
               onClick={clearAllLabels}
-              className="flex items-center px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:bg-gray-50"
+              className="flex items-center px-3 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
               title="Clear all labels"
             >
               <RotateCcw className="w-4 h-4 mr-1" />
@@ -122,15 +122,15 @@ const PatchPanelModal: React.FC<PatchPanelModalProps> = ({
           </div>
 
           {/* Port Grid */}
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {portLabels.map((portLabel) => (
                 <div
                   key={portLabel.portNumber}
-                  className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors"
+                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-gray-300 dark:hover:border-gray-600 transition-colors bg-white dark:bg-gray-800"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-gray-900 dark:text-gray-100">
                       Port {portLabel.portNumber}
                     </span>
                     <div className={`w-3 h-3 rounded-full ${
@@ -174,10 +174,10 @@ const PatchPanelModal: React.FC<PatchPanelModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200">
+        <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200 dark:border-gray-700">
           <button
             onClick={handleClose}
-            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:bg-gray-50"
+            className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
           >
             Cancel
           </button>
@@ -186,8 +186,8 @@ const PatchPanelModal: React.FC<PatchPanelModalProps> = ({
             disabled={!hasChanges}
             className={`flex items-center px-4 py-2 text-sm rounded ${
               hasChanges
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+                : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
             }`}
           >
             <Save className="w-4 h-4 mr-1" />

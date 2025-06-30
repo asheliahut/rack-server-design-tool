@@ -89,7 +89,7 @@ const Panel: React.FC<PanelProps> = ({
       
       {/* Panel Content */}
       {!collapsed && (
-        <div className="panel-content flex-1 overflow-auto">
+        <div className="panel-content flex-1 overflow-auto scrollbar-thin">
           {children}
         </div>
       )}

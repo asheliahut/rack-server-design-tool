@@ -313,7 +313,7 @@ function App() {
               )}
               
               {/* Design Canvas */}
-              <div id="canvas-container" className="flex-1 overflow-auto">
+              <div id="canvas-container" className="flex-1 overflow-auto scrollbar-thin">
                 <div className="p-8 min-h-full flex justify-center items-start">
                   <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-colors">
                 <div className="mb-4">
@@ -380,7 +380,7 @@ function App() {
                   </button>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Component Details</h3>
                 </div>
-                <div className="flex-1 overflow-y-auto p-3 space-y-3">
+                <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-thin">
                   <div>
                     <img
                       src={
