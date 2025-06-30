@@ -23,10 +23,11 @@ const RackUnit: React.FC<RackUnitProps> = ({
   return (
     <div
       className={`
-        rack-unit relative h-11 border-b border-gray-300 transition-colors flex items-center
+        relative h-11 border-b border-gray-300 transition-colors duration-200 ease-in-out flex items-center
         ${isHighlighted ? 'bg-blue-100' : hasComponents ? 'bg-gray-50' : 'bg-white'}
         ${hasComponents ? '' : 'hover:bg-gray-50'}
       `}
+      style={{ height: '44px' }}
     >
       {/* Rack unit rail holes - left side */}
       <div className="rack-unit-rails-left flex flex-col justify-center space-y-1 w-4 h-full px-1">

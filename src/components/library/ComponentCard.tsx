@@ -45,10 +45,10 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
       }}
       onClick={handleClick}
       className={`
-        component-card relative bg-white border rounded-lg p-3 cursor-pointer transition-all duration-200
-        hover:shadow-md hover:border-blue-300 active:scale-95
+        relative bg-white border rounded-lg p-3 cursor-grab transition-all duration-200 ease-in-out
+        hover:shadow-md hover:border-blue-300 hover:-translate-y-0.5 active:scale-95 active:cursor-grabbing
         ${isSelected ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200'}
-        ${isDragging ? 'opacity-50 scale-105 rotate-2 shadow-lg' : ''}
+        ${isDragging ? 'opacity-50 scale-105 rotate-2 shadow-lg pointer-events-none z-50' : ''}
       `}
     >
       {/* Drag indicator */}
@@ -60,7 +60,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
 
       {/* Component Image */}
       <div className="flex items-start space-x-3">
-        <div className="component-image w-16 h-10 bg-gray-100 rounded border flex-shrink-0 overflow-hidden">
+        <div className="w-16 h-10 bg-gray-100 rounded border flex-shrink-0 overflow-hidden">
           <img
             src={imageError ? placeholderSvg : component.imageUrl}
             alt={component.name}
@@ -74,7 +74,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
         </div>
 
         {/* Component Info */}
-        <div className="component-info flex-1 min-w-0">
+        <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
             <h3 className="text-sm font-medium text-gray-900 truncate">
               {component.name}
@@ -92,7 +92,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
           </p>
           
           {/* Component Stats */}
-          <div className="component-stats flex items-center space-x-3 mt-2 text-xs text-gray-500">
+          <div className="flex items-center space-x-3 mt-2 text-xs text-gray-500">
             <span className="flex items-center">
               <span className="w-2 h-2 bg-gray-400 rounded mr-1" />
               {component.height}U
@@ -122,7 +122,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
       )}
       
       {/* Quick Info Tooltip on Hover */}
-      <div className="component-tooltip absolute left-full top-0 ml-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+      <div className="absolute left-full top-0 ml-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
         <div className="text-sm font-medium text-gray-900 mb-2">{component.name}</div>
         <div className="space-y-1 text-xs text-gray-600">
           <div>Manufacturer: {component.specifications.manufacturer}</div>
