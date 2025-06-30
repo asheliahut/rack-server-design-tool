@@ -1,6 +1,7 @@
 import React from 'react';
 import { RackComponent } from '@/types/rack';
 import { createPlaceholderSVG } from '@/utils/imageLoader';
+import { RACK_UNIT_HEIGHT } from '@/constants/rack';
 
 interface DragPreviewProps {
   component: RackComponent;
@@ -17,7 +18,7 @@ const DragPreview: React.FC<DragPreviewProps> = ({
     return null;
   }
 
-  const componentHeight = component.height * 44; // 44px per rack unit
+  const componentHeight = component.height * RACK_UNIT_HEIGHT; // rack units to pixels
   const componentWidth = component.width === 100 ? 568 : 284; // Full or half width
 
   const getCategoryColor = (category: string): string => {

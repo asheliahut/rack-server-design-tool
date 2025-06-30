@@ -1,4 +1,5 @@
 import React from 'react';
+import { RACK_UNIT_HEIGHT } from '@/constants/rack';
 
 interface RackGridProps {
   rackHeight: number;
@@ -14,7 +15,7 @@ const RackGrid: React.FC<RackGridProps> = ({
   if (!gridVisible) return null;
 
   const rackWidth = 572; // Updated usable rack width leaving space for rail holes (720 - 56 - 40 - 24 - 8 - 20)
-  const unitHeight = 44;
+  const unitHeight = RACK_UNIT_HEIGHT;
 
   return (
     <div 

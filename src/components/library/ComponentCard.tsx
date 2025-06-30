@@ -45,7 +45,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
       }}
       onClick={handleClick}
       className={`
-        relative bg-white border rounded-lg p-3 cursor-grab transition-all duration-200 ease-in-out
+        relative bg-white border rounded-lg p-3 cursor-grab transition-all duration-200 ease-in-out w-full
         hover:shadow-md hover:border-blue-300 hover:-translate-y-0.5 active:scale-95 active:cursor-grabbing
         ${isSelected ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200'}
         ${isDragging ? 'opacity-50 scale-105 rotate-2 shadow-lg pointer-events-none z-50' : ''}
@@ -121,19 +121,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
         <div className="absolute inset-0 bg-blue-500 opacity-20 rounded-lg pointer-events-none" />
       )}
       
-      {/* Quick Info Tooltip on Hover */}
-      <div className="absolute left-full top-0 ml-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-        <div className="text-sm font-medium text-gray-900 mb-2">{component.name}</div>
-        <div className="space-y-1 text-xs text-gray-600">
-          <div>Manufacturer: {component.specifications.manufacturer}</div>
-          <div>Model: {component.specifications.model}</div>
-          <div>Height: {component.height}U</div>
-          <div>Width: {component.width}%</div>
-          {component.specifications.power && <div>Power: {component.specifications.power}</div>}
-          {component.specifications.capacity && <div>Capacity: {component.specifications.capacity}</div>}
-          {component.specifications.weight && <div>Weight: {component.specifications.weight}</div>}
-        </div>
-      </div>
+      {/* Tooltip disabled to prevent horizontal scrolling - component details available in properties panel */}
     </div>
   );
 };

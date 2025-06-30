@@ -1,6 +1,7 @@
 import React from 'react';
 import { RackComponent } from '@/types/rack';
 import RackComponentDisplay from './RackComponent';
+import { RACK_UNIT_HEIGHT } from '@/constants/rack';
 
 interface RackUnitProps {
   unitNumber: number;
@@ -23,11 +24,11 @@ const RackUnit: React.FC<RackUnitProps> = ({
   return (
     <div
       className={`
-        relative h-11 border-b border-gray-300 transition-colors duration-200 ease-in-out flex items-center
+        relative border-b border-gray-300 transition-colors duration-200 ease-in-out flex items-center
         ${isHighlighted ? 'bg-blue-100' : hasComponents ? 'bg-gray-50' : 'bg-white'}
         ${hasComponents ? '' : 'hover:bg-gray-50'}
       `}
-      style={{ height: '44px' }}
+      style={{ height: RACK_UNIT_HEIGHT }}
     >
       {/* Rack unit rail holes - left side */}
       <div className="rack-unit-rails-left flex flex-col justify-center space-y-1 w-4 h-full px-1">
@@ -66,7 +67,7 @@ const RackUnit: React.FC<RackUnitProps> = ({
                         className="absolute left-0 right-0"
                         style={{
                           top: 0,
-                          height: component.height * 44, // Span multiple units
+                          height: component.height * RACK_UNIT_HEIGHT, // Span multiple units
                           zIndex: 10,
                         }}
                       >

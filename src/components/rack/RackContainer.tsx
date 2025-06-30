@@ -6,6 +6,7 @@ import RackUnit from './RackUnit.js';
 import RackGrid from './RackGrid.js';
 import SnapGuides from '../design/SnapGuides.js';
 import { useSnapToGrid } from '@/hooks/useSnapToGrid.js';
+import { RACK_UNIT_HEIGHT, RACK_WIDTH_STANDARD, getRackUnitFromY } from '@/constants/rack';
 
 interface RackContainerProps {
   components: RackComponent[];
@@ -42,8 +43,8 @@ const RackContainer: React.FC<RackContainerProps> = ({
         const relativeY = clientOffset.y - rackRect.top;
         
         // Simple rack unit calculation
-        const rackUnitIndex = Math.floor(relativeY / 44);
-        const snapZoneY = rackUnitIndex * 44;
+        const rackUnitIndex = getRackUnitFromY(relativeY);
+        const snapZoneY = rackUnitIndex * RACK_UNIT_HEIGHT;
         const targetRackUnit = Math.max(1, Math.min(rackHeight, rackHeight - rackUnitIndex));
         
         // Check if component would fit within rack bounds
@@ -68,7 +69,7 @@ const RackContainer: React.FC<RackContainerProps> = ({
         const relativeY = clientOffset.y - rackRect.top;
         
         // Simple rack unit calculation
-        const rackUnitIndex = Math.floor(relativeY / 44);
+        const rackUnitIndex = getRackUnitFromY(relativeY);
         const targetRackUnit = Math.max(1, Math.min(rackHeight, rackHeight - rackUnitIndex));
         
         // Check if component would fit within rack bounds
@@ -155,8 +156,8 @@ const RackContainer: React.FC<RackContainerProps> = ({
   }, [draggedItem]);
 
   // Calculate rack dimensions - made wider with better margins
-  const rackWidth = 720; // Increased width for better component spacing
-  const rackHeight_px = rackHeight * 44; // 44px per rack unit
+  const rackWidth = RACK_WIDTH_STANDARD; // Increased width for better component spacing
+  const rackHeight_px = rackHeight * RACK_UNIT_HEIGHT; // rack units to pixels
 
   return (
     <div className="relative">
@@ -182,8 +183,8 @@ const RackContainer: React.FC<RackContainerProps> = ({
             return (
               <div
                 key={unitNumber}
-                className="h-11 flex items-center justify-center text-xs font-mono text-gray-600 bg-gray-50 border border-gray-300 rounded-sm relative shadow-sm"
-                style={{ height: '44px' }}
+                className="flex items-center justify-center text-xs font-mono text-gray-600 bg-gray-50 border border-gray-300 rounded-sm relative shadow-sm"
+                style={{ height: RACK_UNIT_HEIGHT }}
               >
                 <span className="font-bold text-gray-700">{unitNumber}</span>
               </div>

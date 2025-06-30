@@ -99,7 +99,7 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
     <div 
       ref={drop as unknown as React.Ref<HTMLDivElement>}
       id="component-library" 
-      className={`w-80 bg-white border-r border-gray-300 flex flex-col transition-colors ${
+      className={`w-80 bg-white border-r border-gray-300 flex flex-col transition-colors overflow-hidden ${
         isOver && canDrop ? 'bg-red-50 border-red-300' : ''
       }`}
     >
@@ -135,7 +135,7 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
             placeholder="Search components..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus-ring"
           />
         </div>
       </div>
@@ -177,7 +177,7 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
       </div>
       
       {/* Component List */}
-      <div id="component-list" className="flex-1 overflow-y-auto">
+      <div id="component-list" className="flex-1 overflow-y-auto overflow-x-hidden">
         {filteredComponents.length === 0 ? (
           <div className="p-8 text-center">
             <div className="text-gray-400 mb-2">
@@ -197,13 +197,15 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
             )}
           </div>
         ) : (
-          <div className="p-3 space-y-2">
+          <div className="p-3 space-y-2 w-full">
             {filteredComponents.map(component => (
-              <ComponentCard
-                key={component.id}
-                component={component}
-                onSelect={onComponentSelect}
-              />
+              <div className="w-full">
+                <ComponentCard
+                  key={component.id}
+                  component={component}
+                  onSelect={onComponentSelect}
+                />
+              </div>
             ))}
           </div>
         )}

@@ -328,7 +328,7 @@ function App() {
                           });
                         }
                       }}
-                      className="text-lg font-semibold text-gray-800 bg-transparent border-b border-gray-300 focus:outline-none focus:border-blue-400 transition-colors w-full"
+                      className="text-lg font-semibold text-gray-800 input-inline w-full"
                       style={{ minWidth: 120 }}
                       aria-label="Design Name"
                     />
@@ -342,7 +342,7 @@ function App() {
                       max={55}
                       value={pendingRackHeight}
                       onChange={e => handleRackHeightChange(Number(e.target.value))}
-                      className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      className="w-20 input-standard text-sm"
                       style={{ width: 60 }}
                     />
                     <span className="text-sm text-gray-600">U</span>
@@ -364,10 +364,10 @@ function App() {
             
             {/* Properties Panel */}
             {selectedComponent && (
-              <div id="properties-panel" className="w-80 bg-white border-l border-gray-200 flex flex-col relative">
+              <div id="properties-panel" className="w-80 panel-base relative">
                 <div className="flex-shrink-0 relative p-4 border-b border-gray-200">
                   <button
-                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 focus:outline-none"
+                    className="absolute top-2 right-2 btn-icon"
                     title="Close"
                     aria-label="Close details panel"
                     onClick={() => setSelectedComponent(null)}
@@ -411,14 +411,14 @@ function App() {
                           />
                           <button
                             onClick={saveComponentName}
-                            className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none"
+                            className="btn-success"
                             title="Save name"
                           >
                             ✓
                           </button>
                           <button
                             onClick={cancelEditingComponentName}
-                            className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 focus:outline-none"
+                            className="btn-danger"
                             title="Cancel"
                           >
                             ✕
@@ -494,7 +494,7 @@ function App() {
                       <div className="flex items-center justify-between mb-3">
                         <h5 className="font-medium text-gray-900">Port Labels</h5>
                         <div className="flex items-center space-x-2">
-                          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                          <span className="text-xs status-success px-2 py-1 rounded border">
                             {selectedComponent.portLabels?.length || 0} labeled
                           </span>
                           <span className="text-xs text-gray-500">
