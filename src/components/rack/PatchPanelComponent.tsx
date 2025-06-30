@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { RackComponent as RackComponentType } from '@/types/rack';
 import { useDragComponent } from '@/hooks/useDragAndDrop';
-import { createPlaceholderSVG } from '@/utils/imageLoader';
 import PortTooltip from '@/components/ui/PortTooltip';
 
 interface PatchPanelComponentProps {
@@ -16,7 +15,6 @@ const PatchPanelComponent: React.FC<PatchPanelComponentProps> = ({
   onPortClick,
 }) => {
   const [position, setPosition] = useState(component.position);
-  const [imageError, setImageError] = useState(false);
 
   const handleSnapBack = () => {
     setPosition(component.position);
@@ -40,8 +38,6 @@ const PatchPanelComponent: React.FC<PatchPanelComponentProps> = ({
     onPortClick?.(component, portNumber);
   };
 
-  const displayName = component.customName || component.name;
-  const placeholderSvg = createPlaceholderSVG(32, 32, displayName, component.category);
   const totalPorts = component.specifications.ports || 0;
 
   // Calculate grid layout based on port count

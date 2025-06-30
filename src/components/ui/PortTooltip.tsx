@@ -4,17 +4,19 @@ import { PortLabel } from '@/types/rack';
 interface PortTooltipProps {
   portNumber: number;
   portLabel?: PortLabel;
-  children: React.ReactElement;
+  children: React.ReactElement<any>;
 }
 
 const PortTooltip: React.FC<PortTooltipProps> = ({ portNumber, portLabel, children }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const showTooltip = (e: React.MouseEvent) => {
-    clearTimeout(timeoutRef.current);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
     
     const rect = e.currentTarget.getBoundingClientRect();
     const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
@@ -31,7 +33,9 @@ const PortTooltip: React.FC<PortTooltipProps> = ({ portNumber, portLabel, childr
   };
 
   const hideTooltip = () => {
-    clearTimeout(timeoutRef.current);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
     setIsVisible(false);
   };
 
