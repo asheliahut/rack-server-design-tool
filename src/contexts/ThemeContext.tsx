@@ -45,14 +45,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
-    console.log(`Toggling theme from ${theme} to ${newTheme}`);
     setTheme(newTheme);
   };
 
   useEffect(() => {
     const root = window.document.documentElement;
-    console.log(`Applying theme: ${theme}, current classes:`, root.classList.toString());
-    console.log(`Theme state: ${theme}, typeof: ${typeof theme}`);
     
     // Clear any existing theme classes first
     root.classList.remove('dark', 'light');
@@ -61,8 +58,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     if (theme === 'dark') {
       root.classList.add('dark');
     }
-    
-    console.log(`After applying theme: ${theme}, new classes:`, root.classList.toString());
     
     // Update meta theme-color for mobile browsers
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
