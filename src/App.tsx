@@ -6,6 +6,7 @@ import ComponentLibrary from '@/components/library/ComponentLibrary';
 import RackContainer from '@/components/rack/RackContainer';
 import Toolbar from '@/components/ui/Toolbar';
 import PatchPanelModal from '@/components/ui/PatchPanelModal';
+import SinglePortModal from '@/components/ui/SinglePortModal';
 import { useRackDesign } from '@/hooks/useRackDesign';
 import { calculateRackStats } from '@/utils/rackCalculations';
 import { createPlaceholderSVG } from '@/utils/imageLoader';
@@ -25,6 +26,9 @@ function App() {
   const [isEditingComponentName, setIsEditingComponentName] = useState(false);
   const [editedComponentName, setEditedComponentName] = useState('');
   const [isPatchPanelModalOpen, setIsPatchPanelModalOpen] = useState(false);
+  const [isSinglePortModalOpen, setIsSinglePortModalOpen] = useState(false);
+  const [selectedPortComponent, setSelectedPortComponent] = useState<any>(null);
+  const [selectedPortNumber, setSelectedPortNumber] = useState<number>(0);
 
   const {
     currentDesign,
@@ -88,6 +92,43 @@ function App() {
     return component?.name?.toLowerCase().includes('keystone') && 
            component?.name?.toLowerCase().includes('patch') && 
            component?.name?.toLowerCase().includes('panel');
+  };
+
+  const handlePortClick = (component: any, portNumber: number) => {
+    setSelectedPortComponent(component);
+    setSelectedPortNumber(portNumber);
+    setIsSinglePortModalOpen(true);
+  };
+
+  const handleSaveSinglePort = (portNumber: number, portLabel: PortLabel | null) => {
+    if (selectedPortComponent) {
+      let updatedPortLabels = [...(selectedPortComponent.portLabels || [])];
+      
+      if (portLabel) {
+        // Add or update the port label
+        const existingIndex = updatedPortLabels.findIndex(pl => pl.portNumber === portNumber);
+        if (existingIndex >= 0) {
+          updatedPortLabels[existingIndex] = portLabel;
+        } else {
+          updatedPortLabels.push(portLabel);
+        }
+      } else {
+        // Remove the port label
+        updatedPortLabels = updatedPortLabels.filter(pl => pl.portNumber !== portNumber);
+      }
+      
+      const updatedComponent = {
+        ...selectedPortComponent,
+        portLabels: updatedPortLabels
+      };
+      
+      updateComponent(selectedPortComponent.id, updatedComponent);
+      
+      // Update selected component if it's the same one
+      if (selectedComponent?.id === selectedPortComponent.id) {
+        setSelectedComponent(updatedComponent);
+      }
+    }
   };
 
   // Helper to update rack height in the design
@@ -314,6 +355,7 @@ function App() {
                       onComponentDrop={addComponent}
                       onComponentMove={moveComponent}
                       onComponentSelect={setSelectedComponent}
+                      onPortClick={handlePortClick}
                     />
                   </div>
                 </div>
@@ -537,6 +579,17 @@ function App() {
             onClose={() => setIsPatchPanelModalOpen(false)}
             component={selectedComponent}
             onSave={handleSavePortLabels}
+          />
+        )}
+        
+        {/* Single Port Modal */}
+        {selectedPortComponent && (
+          <SinglePortModal
+            isOpen={isSinglePortModalOpen}
+            onClose={() => setIsSinglePortModalOpen(false)}
+            component={selectedPortComponent}
+            portNumber={selectedPortNumber}
+            onSave={handleSaveSinglePort}
           />
         )}
       </DndProvider>

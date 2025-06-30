@@ -13,6 +13,7 @@ interface RackContainerProps {
   onComponentDrop: (component: RackComponent, position: RackPosition) => void;
   onComponentMove: (componentId: string, newPosition: RackPosition) => void;
   onComponentSelect?: (component: RackComponent) => void;
+  onPortClick?: (component: RackComponent, portNumber: number) => void;
 }
 
 const RackContainer: React.FC<RackContainerProps> = ({
@@ -21,6 +22,7 @@ const RackContainer: React.FC<RackContainerProps> = ({
   onComponentDrop,
   onComponentMove,
   onComponentSelect,
+  onPortClick,
 }) => {
   const { snapToGrid, snapGuides, clearSnapGuides } = useSnapToGrid(rackHeight);
   const dropRef = useRef<HTMLDivElement>(null);
@@ -211,6 +213,7 @@ const RackContainer: React.FC<RackContainerProps> = ({
                 unitNumber={unitNumber}
                 components={unitComponents}
                 onComponentSelect={onComponentSelect}
+                onPortClick={onPortClick}
               />
             );
           })}

@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import { RackComponent as RackComponentType } from '@/types/rack';
 import { useDragComponent } from '@/hooks/useDragAndDrop';
 import { createPlaceholderSVG } from '@/utils/imageLoader';
+import PatchPanelComponent from './PatchPanelComponent';
 
 interface RackComponentProps {
   component: RackComponentType;
   onSelect?: (component: RackComponentType) => void;
+  onPortClick?: (component: RackComponentType, portNumber: number) => void;
 }
 
 const RackComponent: React.FC<RackComponentProps> = ({
   component,
   onSelect,
+  onPortClick,
 }) => {
   // Track position in local state for snap-back
   const [position, setPosition] = useState(component.position);
@@ -43,6 +46,17 @@ const RackComponent: React.FC<RackComponentProps> = ({
 
   const displayName = component.customName || component.name;
   const placeholderSvg = createPlaceholderSVG(32, 32, displayName, component.category);
+
+  // Use specialized component for patch panels
+  if (isPatchPanel(component)) {
+    return (
+      <PatchPanelComponent
+        component={component}
+        onSelect={onSelect}
+        onPortClick={onPortClick}
+      />
+    );
+  }
 
   return (
     <div

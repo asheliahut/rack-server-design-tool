@@ -8,6 +8,7 @@ interface RackUnitProps {
   isHighlighted?: boolean;
   onComponentSelect?: (component: RackComponent) => void;
   onComponentRemove?: (componentId: string) => void;
+  onPortClick?: (component: RackComponent, portNumber: number) => void;
 }
 
 const RackUnit: React.FC<RackUnitProps> = ({
@@ -15,6 +16,7 @@ const RackUnit: React.FC<RackUnitProps> = ({
   components,
   isHighlighted = false,
   onComponentSelect,
+  onPortClick,
 }) => {
   const hasComponents = components.length > 0;
 
@@ -70,6 +72,7 @@ const RackUnit: React.FC<RackUnitProps> = ({
                         <RackComponentDisplay
                           component={component}
                           onSelect={onComponentSelect}
+                          onPortClick={onPortClick}
                         />
                       </div>
                     );
@@ -80,6 +83,7 @@ const RackUnit: React.FC<RackUnitProps> = ({
                         key={component.id}
                         component={component}
                         onSelect={onComponentSelect}
+                        onPortClick={onPortClick}
                       />
                     );
                   }
