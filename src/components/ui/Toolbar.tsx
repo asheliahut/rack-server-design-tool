@@ -11,9 +11,12 @@ import {
   Redo,
   Copy,
   Palette,
-  Upload
+  Upload,
+  Sun,
+  Moon
 } from 'lucide-react';
 import Button from './Button';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface ToolbarProps {
   onSave?: () => void;
@@ -44,6 +47,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onRedo,
   onDuplicate,
 }) => {
+  const { theme, toggleTheme } = useTheme();
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState(designName);
 
@@ -80,17 +84,17 @@ const Toolbar: React.FC<ToolbarProps> = ({
   };
 
   return (
-    <div id="main-toolbar" className="h-16 bg-white border-b border-gray-300 flex items-center px-6 shadow-sm">
+    <div id="main-toolbar" className="h-16 bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 flex items-center px-6 shadow-sm transition-colors">
       {/* Left section - App title and design name */}
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
             <Palette className="w-5 h-5 text-white" />
           </div>
-          <h1 className="text-xl font-semibold text-gray-900">Rack Designer</h1>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Rack Designer</h1>
         </div>
         
-        <div className="h-6 w-px bg-gray-300" />
+        <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
         
         {/* Design name editor */}
         <div className="flex items-center space-x-2">
@@ -102,14 +106,14 @@ const Toolbar: React.FC<ToolbarProps> = ({
               onChange={(e) => setTempName(e.target.value)}
               onBlur={handleNameSave}
               onKeyDown={handleKeyPress}
-              className="px-2 py-1 border border-blue-300 rounded text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-2 py-1 border border-blue-300 dark:border-blue-500 rounded text-sm font-medium bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               autoFocus
             />
           ) : (
             <button
               id="design-name-edit-btn"
               onClick={handleNameEdit}
-              className="px-2 py-1 text-sm font-medium text-gray-900 hover:bg-gray-100 rounded"
+              className="px-2 py-1 text-sm font-medium text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
             >
               {designName}
             </button>
@@ -141,7 +145,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           <Redo className="w-4 h-4" />
         </Button>
         
-        <div className="h-6 w-px bg-gray-300 mx-2" />
+        <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-2" />
         
         <Button
           id="toolbar-duplicate-btn"
@@ -159,7 +163,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           size="sm"
           onClick={onClear}
           title="Clear All Components"
-          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+          className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20"
         >
           <Trash2 className="w-4 h-4" />
         </Button>
@@ -180,17 +184,17 @@ const Toolbar: React.FC<ToolbarProps> = ({
           </Button>
           
           {/* Load dropdown menu */}
-          <div id="load-dropdown-menu" className="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+          <div id="load-dropdown-menu" className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-600 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
             <div className="py-1">
               <button
                 id="load-storage-btn"
                 onClick={() => onLoad?.()}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
               >
                 <FolderOpen className="w-4 h-4 mr-2" />
                 Load from Storage
               </button>
-              <label className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer">
+              <label className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center cursor-pointer">
                 <Upload className="w-4 h-4 mr-2" />
                 Load from File
                 <input
@@ -230,12 +234,12 @@ const Toolbar: React.FC<ToolbarProps> = ({
           </Button>
           
           {/* Dropdown menu */}
-          <div id="export-dropdown-menu" className="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+          <div id="export-dropdown-menu" className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-600 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
             <div className="py-1">
               <button
                 id="export-json-btn"
                 onClick={() => onExport?.()}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
               >
                 <FileText className="w-4 h-4 mr-2" />
                 Export as JSON
@@ -243,7 +247,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
               <button
                 id="export-pdf-btn"
                 onClick={() => {/* Handle PDF export */}}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
               >
                 <FileText className="w-4 h-4 mr-2" />
                 Export as PDF
@@ -251,7 +255,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
               <button
                 id="export-image-btn"
                 onClick={() => {/* Handle image export */}}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
               >
                 <Download className="w-4 h-4 mr-2" />
                 Export as Image
@@ -260,7 +264,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           </div>
         </div>
         
-        <div className="h-6 w-px bg-gray-300" />
+        <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
         
         <Button
           id="toolbar-share-btn"
@@ -269,6 +273,20 @@ const Toolbar: React.FC<ToolbarProps> = ({
           title="Share Design"
         >
           <Share2 className="w-4 h-4" />
+        </Button>
+        
+        <Button
+          id="toolbar-theme-toggle-btn"
+          variant="ghost"
+          size="sm"
+          onClick={toggleTheme}
+          title={`Currently ${theme} mode - click to switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+        >
+          {theme === 'light' ? (
+            <Moon className="w-4 h-4" />
+          ) : (
+            <Sun className="w-4 h-4" />
+          )}
         </Button>
         
         <Button

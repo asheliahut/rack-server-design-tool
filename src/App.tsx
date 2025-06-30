@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import ComponentLibrary from '@/components/library/ComponentLibrary';
 import RackContainer from '@/components/rack/RackContainer';
 import Toolbar from '@/components/ui/Toolbar';
@@ -254,8 +255,9 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <DndProvider backend={HTML5Backend}>
-        <div id="app-root" className="h-screen flex flex-col bg-gray-50">
+      <ThemeProvider>
+        <DndProvider backend={HTML5Backend}>
+          <div id="app-root" className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
           {/* Toolbar */}
           <Toolbar
             onSave={handleSave}
@@ -287,23 +289,23 @@ function App() {
             <div id="design-area" className="flex-1 flex flex-col">
               {/* Stats Panel */}
               {rackStats && (
-                <div id="stats-panel" className="bg-white border-b border-gray-200 p-4">
+                <div id="stats-panel" className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex gap-6 text-sm">
-                      <span className="font-medium">
-                        Utilization: <span className="text-blue-600">{rackStats.utilizationPercentage.toFixed(1)}%</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        Utilization: <span className="text-blue-600 dark:text-blue-400">{rackStats.utilizationPercentage.toFixed(1)}%</span>
                       </span>
-                      <span className="font-medium">
-                        Used Units: <span className="text-green-600">{rackStats.usedUnits}/{currentDesign?.rackHeight}U</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        Used Units: <span className="text-green-600 dark:text-green-400">{rackStats.usedUnits}/{currentDesign?.rackHeight}U</span>
                       </span>
-                      <span className="font-medium">
-                        Power: <span className="text-orange-600">{rackStats.totalPower}W</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        Power: <span className="text-orange-600 dark:text-orange-400">{rackStats.totalPower}W</span>
                       </span>
-                      <span className="font-medium">
-                        Weight: <span className="text-purple-600">{rackStats.totalWeight.toFixed(1)}kg</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        Weight: <span className="text-purple-600 dark:text-purple-400">{rackStats.totalWeight.toFixed(1)}kg</span>
                       </span>
-                      <span className="font-medium">
-                        Components: <span className="text-gray-600">{rackStats.totalComponents}</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        Components: <span className="text-gray-600 dark:text-gray-400">{rackStats.totalComponents}</span>
                       </span>
                     </div>
                   </div>
@@ -313,7 +315,7 @@ function App() {
               {/* Design Canvas */}
               <div id="canvas-container" className="flex-1 overflow-auto">
                 <div className="p-8 min-h-full flex justify-center items-start">
-                  <div className="bg-white rounded-lg shadow-lg p-6">
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-colors">
                 <div className="mb-4">
                   <div className="flex items-center gap-2">
                     <input
@@ -328,13 +330,13 @@ function App() {
                           });
                         }
                       }}
-                      className="text-lg font-semibold text-gray-800 input-inline w-full"
+                      className="text-lg font-semibold text-gray-800 dark:text-gray-200 input-inline w-full"
                       style={{ minWidth: 120 }}
                       aria-label="Design Name"
                     />
                   </div>
                   <div className="flex items-center gap-2 mt-2">
-                    <label htmlFor="rack-height-input" className="text-sm text-gray-600 font-medium">Rack Height:</label>
+                    <label htmlFor="rack-height-input" className="text-sm text-gray-600 dark:text-gray-400 font-medium">Rack Height:</label>
                     <input
                       id="rack-height-input"
                       type="number"
@@ -345,7 +347,7 @@ function App() {
                       className="w-20 input-standard text-sm"
                       style={{ width: 60 }}
                     />
-                    <span className="text-sm text-gray-600">U</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">U</span>
                   </div>
                 </div>
                     
@@ -376,7 +378,7 @@ function App() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
-                  <h3 className="text-lg font-semibold">Component Details</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Component Details</h3>
                 </div>
                 <div className="flex-1 overflow-y-auto p-3 space-y-3">
                   <div>
@@ -405,7 +407,7 @@ function App() {
                               if (e.key === 'Enter') saveComponentName();
                               if (e.key === 'Escape') cancelEditingComponentName();
                             }}
-                            className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                             autoFocus
                             placeholder="Enter component name"
                           />
@@ -426,7 +428,7 @@ function App() {
                         </div>
                       ) : (
                         <div className="flex-1 flex items-center justify-between">
-                          <h4 className="font-medium text-gray-900">
+                          <h4 className="font-medium text-gray-900 dark:text-gray-100">
                             {selectedComponent.customName || selectedComponent.name}
                           </h4>
                           <button
@@ -442,47 +444,47 @@ function App() {
                       )}
                     </div>
                     {selectedComponent.customName && (
-                      <p className="text-xs text-gray-500 mb-1">Original: {selectedComponent.name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Original: {selectedComponent.name}</p>
                     )}
-                    <p className="text-sm text-gray-600 capitalize">{selectedComponent.category}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">{selectedComponent.category}</p>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <span className="text-gray-600">Height:</span>
-                      <span className="ml-1 font-medium">{selectedComponent.height}U</span>
+                      <span className="text-gray-600 dark:text-gray-400">Height:</span>
+                      <span className="ml-1 font-medium text-gray-900 dark:text-gray-100">{selectedComponent.height}U</span>
                     </div>
                     <div>
-                      <span className="text-gray-600">Width:</span>
-                      <span className="ml-1 font-medium">{selectedComponent.width}%</span>
+                      <span className="text-gray-600 dark:text-gray-400">Width:</span>
+                      <span className="ml-1 font-medium text-gray-900 dark:text-gray-100">{selectedComponent.width}%</span>
                     </div>
                   </div>
                   <div className="border-t pt-3">
-                    <h5 className="font-medium text-gray-900 mb-2 text-sm">Specifications</h5>
+                    <h5 className="font-medium text-gray-900 dark:text-gray-100 mb-2 text-sm">Specifications</h5>
                     <div className="space-y-1 text-xs">
                       <div>
-                        <span className="text-gray-600">Manufacturer:</span>
-                        <span className="ml-1">{selectedComponent.specifications.manufacturer}</span>
+                        <span className="text-gray-600 dark:text-gray-400">Manufacturer:</span>
+                        <span className="ml-1 text-gray-900 dark:text-gray-100">{selectedComponent.specifications.manufacturer}</span>
                       </div>
                       <div>
-                        <span className="text-gray-600">Model:</span>
-                        <span className="ml-1">{selectedComponent.specifications.model}</span>
+                        <span className="text-gray-600 dark:text-gray-400">Model:</span>
+                        <span className="ml-1 text-gray-900 dark:text-gray-100">{selectedComponent.specifications.model}</span>
                       </div>
                       {selectedComponent.specifications.power && (
                         <div>
-                          <span className="text-gray-600">Power:</span>
-                          <span className="ml-1">{selectedComponent.specifications.power}</span>
+                          <span className="text-gray-600 dark:text-gray-400">Power:</span>
+                          <span className="ml-1 text-gray-900 dark:text-gray-100">{selectedComponent.specifications.power}</span>
                         </div>
                       )}
                       {selectedComponent.specifications.weight && (
                         <div>
-                          <span className="text-gray-600">Weight:</span>
-                          <span className="ml-1">{selectedComponent.specifications.weight}</span>
+                          <span className="text-gray-600 dark:text-gray-400">Weight:</span>
+                          <span className="ml-1 text-gray-900 dark:text-gray-100">{selectedComponent.specifications.weight}</span>
                         </div>
                       )}
                       {selectedComponent.specifications.capacity && (
                         <div>
-                          <span className="text-gray-600">Capacity:</span>
-                          <span className="ml-1">{selectedComponent.specifications.capacity}</span>
+                          <span className="text-gray-600 dark:text-gray-400">Capacity:</span>
+                          <span className="ml-1 text-gray-900 dark:text-gray-100">{selectedComponent.specifications.capacity}</span>
                         </div>
                       )}
                     </div>
@@ -492,12 +494,12 @@ function App() {
                   {isPatchPanel(selectedComponent) && (
                     <div className="border-t pt-3">
                       <div className="flex items-center justify-between mb-3">
-                        <h5 className="font-medium text-gray-900">Port Labels</h5>
+                        <h5 className="font-medium text-gray-900 dark:text-gray-100">Port Labels</h5>
                         <div className="flex items-center space-x-2">
                           <span className="text-xs status-success px-2 py-1 rounded border">
                             {selectedComponent.portLabels?.length || 0} labeled
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
                             of {selectedComponent.specifications.ports}
                           </span>
                         </div>
@@ -505,17 +507,17 @@ function App() {
                       
                       {/* Enhanced Port Grid Preview */}
                       {selectedComponent.specifications.ports && (
-                        <div className="mb-3 p-3 bg-gray-50 rounded border">
+                        <div className="mb-3 p-3 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs font-medium text-gray-700">Port Status</span>
+                            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Port Status</span>
                             <div className="flex items-center space-x-3 text-xs">
                               <div className="flex items-center space-x-1">
                                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                <span className="text-gray-600">Labeled</span>
+                                <span className="text-gray-600 dark:text-gray-400">Labeled</span>
                               </div>
                               <div className="flex items-center space-x-1">
                                 <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                                <span className="text-gray-600">Empty</span>
+                                <span className="text-gray-600 dark:text-gray-400">Empty</span>
                               </div>
                             </div>
                           </div>
@@ -529,8 +531,8 @@ function App() {
                                   key={portNumber}
                                   className={`w-4 h-4 rounded flex items-center justify-center text-xs border cursor-help transition-colors ${
                                     hasLabel 
-                                      ? 'bg-green-500 text-white border-green-600 hover:bg-green-600' 
-                                      : 'bg-white text-gray-500 border-gray-300 hover:bg-gray-50'
+                                      ? 'bg-green-500 text-white border-green-600 hover:bg-green-600 dark:bg-green-600 dark:border-green-500 dark:hover:bg-green-700' 
+                                      : 'bg-white dark:bg-gray-600 text-gray-500 dark:text-gray-300 border-gray-300 dark:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-500'
                                   }`}
                                   title={hasLabel ? `Port ${portNumber}: ${portLabel?.label}${portLabel?.description ? ` - ${portLabel.description}` : ''}` : `Port ${portNumber}: Click "Label Ports" to add labels`}
                                 >
@@ -592,7 +594,8 @@ function App() {
             onSave={handleSaveSinglePort}
           />
         )}
-      </DndProvider>
+        </DndProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

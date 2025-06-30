@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (.dark &);
+
 /* Base styles that can't be easily replicated with Tailwind utilities */
 * {
   box-sizing: border-box;
@@ -23,73 +25,73 @@ html, body {
 
 /* Component-layer utilities for common patterns */
 @layer components {
-  /* Button variants */
+  /* Button variants with dark mode support */
   .btn-success {
-    @apply px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-colors;
+    @apply px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-colors;
   }
   
   .btn-danger {
-    @apply px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-colors;
+    @apply px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-colors;
   }
   
   .btn-outline {
-    @apply flex items-center px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors;
+    @apply flex items-center px-3 py-1 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors;
   }
   
   .btn-icon {
-    @apply p-1 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded transition-colors;
+    @apply p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded transition-colors;
   }
   
-  /* Card and panel patterns */
+  /* Card and panel patterns with dark mode support */
   .card-base {
-    @apply bg-white border border-gray-200 rounded-lg shadow-md;
+    @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md;
   }
   
   .panel-base {
-    @apply bg-white border-l border-gray-200 flex flex-col;
+    @apply bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col;
   }
   
   .modal-overlay {
-    @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4;
+    @apply fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4;
   }
   
   .modal-content {
-    @apply bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto;
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto;
   }
   
-  /* Input patterns */
+  /* Input patterns with dark mode support */
   .input-standard {
-    @apply px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors;
+    @apply px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors;
   }
   
   .input-inline {
-    @apply bg-transparent border-b border-gray-300 focus:outline-none focus:border-blue-400 transition-colors;
+    @apply bg-transparent border-b border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-400 dark:focus:border-blue-500 transition-colors;
   }
   
-  /* Focus ring standardization */
+  /* Focus ring standardization with dark mode */
   .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800;
   }
   
   .focus-ring-inset {
     @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset;
   }
   
-  /* Status indicators using consistent color system */
+  /* Status indicators with dark mode support */
   .status-success {
-    @apply bg-green-100 text-green-800 border-green-300;
+    @apply bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300 border-green-300 dark:border-green-700;
   }
   
   .status-warning {
-    @apply bg-yellow-100 text-yellow-800 border-yellow-300;
+    @apply bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700;
   }
   
   .status-error {
-    @apply bg-red-100 text-red-800 border-red-300;
+    @apply bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300 border-red-300 dark:border-red-700;
   }
   
   .status-info {
-    @apply bg-blue-100 text-blue-800 border-blue-300;
+    @apply bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700;
   }
 }
 

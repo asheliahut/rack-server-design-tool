@@ -59,7 +59,7 @@ const PatchPanelComponent: React.FC<PatchPanelComponentProps> = ({
       }}
       onClick={handleBackgroundClick}
       className={`
-        w-full h-full border border-gray-300 rounded bg-white shadow-sm
+        w-full h-full border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-600 shadow-sm
         hover:shadow-md transition-shadow cursor-pointer patch-panel-background
         ${isDragging ? 'opacity-50' : ''}
       `}
@@ -99,7 +99,7 @@ const PatchPanelComponent: React.FC<PatchPanelComponentProps> = ({
                     hover:scale-105 active:scale-95
                     ${hasLabel 
                       ? 'bg-green-500 text-white border-green-600 hover:bg-green-600 shadow-sm' 
-                      : 'bg-white text-gray-600 border-gray-300 hover:bg-blue-50 hover:border-blue-300'
+                      : 'bg-white dark:bg-gray-500 text-gray-600 dark:text-gray-100 border-gray-300 dark:border-gray-400 hover:bg-blue-50 dark:hover:bg-blue-800 hover:border-blue-300 dark:hover:border-blue-400'
                     }
                   `}
                   style={{

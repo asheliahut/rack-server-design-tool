@@ -140,28 +140,28 @@ const PatchPanelModal: React.FC<PatchPanelModalProps> = ({
                   
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Label
                       </label>
                       <input
                         type="text"
                         value={portLabel.label}
                         onChange={(e) => updatePortLabel(portLabel.portNumber, 'label', e.target.value)}
-                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                         placeholder="e.g., Office-101"
                         maxLength={50}
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Description (optional)
                       </label>
                       <input
                         type="text"
                         value={portLabel.description || ''}
                         onChange={(e) => updatePortLabel(portLabel.portNumber, 'description', e.target.value)}
-                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                         placeholder="e.g., Main conference room"
                         maxLength={100}
                       />

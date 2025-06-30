@@ -5,9 +5,13 @@ export default {
     extend: {
       colors: {
         "rack-frame": "#2a2a2a",
+        "rack-frame-dark": "#1a1a1a",
         "rack-unit": "#3a3a3a", 
+        "rack-unit-dark": "#2a2a2a",
         "rack-highlight": "#4a90e2",
+        "rack-highlight-dark": "#60a5fa",
         "rack-snap": "#ffd700",
+        "rack-snap-dark": "#fbbf24",
         "component-server": "#1e40af",
         "component-storage": "#059669",
         "component-network": "#dc2626",

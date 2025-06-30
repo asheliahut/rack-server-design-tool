@@ -66,7 +66,7 @@ const RackComponent: React.FC<RackComponentProps> = ({
       }}
       onClick={handleClick}
       className={`
-        w-full h-full border border-gray-300 rounded bg-white shadow-sm
+        w-full h-full border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-600 shadow-sm
         hover:shadow-md transition-shadow cursor-pointer flex items-center
         ${isDragging ? 'opacity-50' : ''}
       `}
@@ -89,15 +89,15 @@ const RackComponent: React.FC<RackComponentProps> = ({
           }}
         />
         <div className="flex-1 min-w-0">
-          <div className="text-xs font-medium text-gray-900 truncate">
+          <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
             {component.customName || component.name}
           </div>
-          <div className="text-xs text-gray-500 truncate">
+          <div className="text-xs text-gray-500 dark:text-gray-300 truncate">
             {component.specifications.manufacturer} {component.specifications.model}
           </div>
           {/* Show port label count for patch panels */}
           {isPatchPanel(component) && (
-            <div className="text-xs text-blue-600 truncate">
+            <div className="text-xs text-blue-600 dark:text-blue-400 truncate">
               {component.portLabels?.length || 0}/{component.specifications.ports} ports labeled
             </div>
           )}

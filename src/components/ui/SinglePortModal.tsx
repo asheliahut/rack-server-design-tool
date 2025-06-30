@@ -128,37 +128,37 @@ const SinglePortModal: React.FC<SinglePortModalProps> = ({
 
           {/* Label Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Port Label <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Port Label <span className="text-red-500 dark:text-red-400">*</span>
             </label>
             <input
               type="text"
               value={label}
               onChange={(e) => handleLabelChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               placeholder="e.g., Office-101, Server Room A, etc."
               maxLength={50}
               autoFocus
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {label.length}/50 characters
             </p>
           </div>
 
           {/* Description Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Description (optional)
             </label>
             <textarea
               value={description}
               onChange={(e) => handleDescriptionChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               placeholder="Additional details about this connection..."
               maxLength={200}
               rows={3}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {description.length}/200 characters
             </p>
           </div>

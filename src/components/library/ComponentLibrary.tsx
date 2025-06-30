@@ -11,7 +11,7 @@ import {
   powerComponents,
   accessoryComponents,
 } from '@/data/serverComponents';
-import { Search, Server, HardDrive, Wifi, Zap, Wrench, Square } from 'lucide-react';
+import { Search, Server, HardDrive, Wifi, Zap, Wrench, ChevronLeft, Square } from 'lucide-react';
 
 interface ComponentLibraryProps {
   onComponentSelect?: (component: RackComponent) => void;
@@ -82,11 +82,11 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
 
   if (isCollapsed) {
     return (
-      <div id="library-collapsed" className="w-12 bg-white border-r border-gray-300 flex flex-col items-center py-4">
+      <div id="library-collapsed" className="w-12 bg-white dark:bg-gray-800 border-r border-gray-300 dark:border-gray-700 flex flex-col items-center py-4">
         <button
           id="library-expand-btn"
           onClick={() => setIsCollapsed(false)}
-          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded"
+          className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
           title="Expand Component Library"
         >
           <Server className="w-5 h-5" />
@@ -99,49 +99,49 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
     <div 
       ref={drop as unknown as React.Ref<HTMLDivElement>}
       id="component-library" 
-      className={`w-80 bg-white border-r border-gray-300 flex flex-col transition-colors overflow-hidden ${
-        isOver && canDrop ? 'bg-red-50 border-red-300' : ''
+      className={`w-80 bg-white dark:bg-gray-800 border-r border-gray-300 dark:border-gray-600 flex flex-col transition-colors overflow-hidden ${
+        isOver && canDrop ? 'bg-red-50 dark:bg-red-900/50 border-red-300 dark:border-red-600' : ''
       }`}
     >
       {/* Drop Zone Indicator */}
       {isOver && canDrop && (
-        <div className="bg-red-100 border-b-2 border-red-400 p-3 text-center">
-          <div className="text-red-700 font-medium text-sm">
+        <div className="bg-red-100 dark:bg-red-900/50 border-b-2 border-red-400 dark:border-red-600 p-3 text-center">
+          <div className="text-red-700 dark:text-red-300 font-medium text-sm">
             🗑️ Drop here to remove component
           </div>
         </div>
       )}
       
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-gray-900">Components</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Components</h2>
           <button
             id="library-collapse-btn"
             onClick={() => setIsCollapsed(true)}
-            className="p-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded"
+            className="p-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
             title="Collapse Component Library"
           >
-            <Square className="w-4 h-4" />
+            <ChevronLeft className="w-4 h-4" />
           </button>
         </div>
         
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
           <input
             id="component-search-input"
             type="text"
             placeholder="Search components..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm focus-ring"
+            className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus-ring"
           />
         </div>
       </div>
       
       {/* Category Tabs */}
-      <div id="category-tabs" className="border-b border-gray-200">
+      <div id="category-tabs" className="border-b border-gray-200 dark:border-gray-700">
         <div className="flex flex-wrap gap-1 p-3">
           {categories.map(category => {
             const Icon = category.icon;
@@ -169,8 +169,8 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
       </div>
       
       {/* Component Count */}
-      <div id="component-count" className="px-4 py-2 bg-gray-50 border-b border-gray-200">
-        <span className="text-xs text-gray-600">
+      <div id="component-count" className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
+        <span className="text-xs text-gray-600 dark:text-gray-400">
           {filteredComponents.length} {filteredComponents.length === 1 ? 'component' : 'components'}
           {searchTerm && ` matching "${searchTerm}"`}
         </span>

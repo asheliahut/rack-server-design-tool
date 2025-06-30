@@ -164,9 +164,9 @@ const RackContainer: React.FC<RackContainerProps> = ({
       <div
         ref={dropRef}
         className={`
-          relative bg-rack-frame rounded-lg p-6
+          relative bg-rack-frame dark:bg-rack-frame-dark rounded-lg p-6
           transition-colors duration-200 shadow-lg
-          ${isOver ? 'bg-blue-50' : ''}
+          ${isOver ? 'bg-blue-50 dark:bg-blue-900/50' : ''}
         `}
         style={{
           width: rackWidth,
@@ -183,10 +183,10 @@ const RackContainer: React.FC<RackContainerProps> = ({
             return (
               <div
                 key={unitNumber}
-                className="flex items-center justify-center text-xs font-mono text-gray-600 bg-gray-50 border border-gray-300 rounded-sm relative shadow-sm"
+                className="flex items-center justify-center text-xs font-mono text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-sm relative shadow-sm"
                 style={{ height: RACK_UNIT_HEIGHT }}
               >
-                <span className="font-bold text-gray-700">{unitNumber}</span>
+                <span className="font-bold text-gray-700 dark:text-gray-200">{unitNumber}</span>
               </div>
             );
           })}
@@ -222,16 +222,16 @@ const RackContainer: React.FC<RackContainerProps> = ({
         
         {/* Drop overlay when dragging */}
         {isOver && draggedItem && (
-          <div className="absolute inset-2 border-2 border-dashed border-blue-400 bg-blue-50 opacity-40 rounded-md pointer-events-none" />
+          <div className="absolute inset-2 border-2 border-dashed border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/50 opacity-40 rounded-md pointer-events-none" />
         )}
         
         {/* Rack frame decoration */}
-        <div className="absolute inset-0 border-4 border-gray-800 rounded-lg pointer-events-none">
+        <div className="absolute inset-0 border-4 border-gray-800 dark:border-gray-400 rounded-lg pointer-events-none">
           {/* Corner bolts */}
-          <div className="absolute top-2 left-2 w-2 h-2 bg-gray-600 rounded-full"></div>
-          <div className="absolute top-2 right-2 w-2 h-2 bg-gray-600 rounded-full"></div>
-          <div className="absolute bottom-2 left-2 w-2 h-2 bg-gray-600 rounded-full"></div>
-          <div className="absolute bottom-2 right-2 w-2 h-2 bg-gray-600 rounded-full"></div>
+          <div className="absolute top-2 left-2 w-2 h-2 bg-gray-600 dark:bg-gray-300 rounded-full"></div>
+          <div className="absolute top-2 right-2 w-2 h-2 bg-gray-600 dark:bg-gray-300 rounded-full"></div>
+          <div className="absolute bottom-2 left-2 w-2 h-2 bg-gray-600 dark:bg-gray-300 rounded-full"></div>
+          <div className="absolute bottom-2 right-2 w-2 h-2 bg-gray-600 dark:bg-gray-300 rounded-full"></div>
         </div>
       </div>
     </div>

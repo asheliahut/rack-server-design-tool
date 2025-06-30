@@ -24,9 +24,9 @@ const RackUnit: React.FC<RackUnitProps> = ({
   return (
     <div
       className={`
-        relative border-b border-gray-300 transition-colors duration-200 ease-in-out flex items-center
-        ${isHighlighted ? 'bg-blue-100' : hasComponents ? 'bg-gray-50' : 'bg-white'}
-        ${hasComponents ? '' : 'hover:bg-gray-50'}
+        relative border-b border-gray-300 dark:border-gray-600 transition-colors duration-200 ease-in-out flex items-center
+        ${isHighlighted ? 'bg-blue-100 dark:bg-blue-900/50' : hasComponents ? 'bg-gray-50 dark:bg-gray-700' : 'bg-white dark:bg-gray-800'}
+        ${hasComponents ? '' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}
       `}
       style={{ height: RACK_UNIT_HEIGHT }}
     >
@@ -96,8 +96,8 @@ const RackUnit: React.FC<RackUnitProps> = ({
             // This unit is covered by a multi-unit component but doesn't start here
             // Show a visual indicator that this space is occupied
             return (
-              <div className="absolute inset-0 bg-gray-100 border border-gray-300 flex items-center justify-center">
-                <span className="text-xs text-gray-500 font-mono">
+              <div className="absolute inset-0 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 flex items-center justify-center">
+                <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
                   {componentsSpanningHere[0].name}
                 </span>
               </div>
@@ -106,8 +106,8 @@ const RackUnit: React.FC<RackUnitProps> = ({
             // Empty unit - show guides
             return (
               <>
-                <div className="absolute top-2 left-2 right-2 h-px bg-gray-200"></div>
-                <div className="absolute bottom-2 left-2 right-2 h-px bg-gray-200"></div>
+                <div className="absolute top-2 left-2 right-2 h-px bg-gray-200 dark:bg-gray-600"></div>
+                <div className="absolute bottom-2 left-2 right-2 h-px bg-gray-200 dark:bg-gray-600"></div>
               </>
             );
           }
