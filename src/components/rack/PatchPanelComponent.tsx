@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { RackComponent as RackComponentType } from '@/types/rack';
 import { useDragComponent } from '@/hooks/useDragAndDrop';
 import { createPlaceholderSVG } from '@/utils/imageLoader';
+import PortTooltip from '@/components/ui/PortTooltip';
 
 interface PatchPanelComponentProps {
   component: RackComponentType;
@@ -27,9 +28,9 @@ const PatchPanelComponent: React.FC<PatchPanelComponentProps> = ({
     handleSnapBack
   );
 
-  const handleClick = (e: React.MouseEvent) => {
-    // Prevent component selection when clicking on ports
-    if (!(e.target as HTMLElement).closest('.port-grid')) {
+  const handleBackgroundClick = (e: React.MouseEvent) => {
+    // Only trigger if clicking on the background area (not on ports)
+    if ((e.target as HTMLElement).classList.contains('patch-panel-background')) {
       onSelect?.(component);
     }
   };
@@ -60,10 +61,10 @@ const PatchPanelComponent: React.FC<PatchPanelComponentProps> = ({
         drag(node);
         preview(node);
       }}
-      onClick={handleClick}
+      onClick={handleBackgroundClick}
       className={`
         w-full h-full border border-gray-300 rounded bg-white shadow-sm
-        hover:shadow-md transition-shadow cursor-pointer
+        hover:shadow-md transition-shadow cursor-pointer patch-panel-background
         ${isDragging ? 'opacity-50' : ''}
       `}
       style={{
@@ -72,11 +73,12 @@ const PatchPanelComponent: React.FC<PatchPanelComponentProps> = ({
         top: position?.y,
         position: 'absolute',
       }}
+      title="Click background to view component details"
     >
-      {/* Port Grid - Full component space */}
-      <div className="p-1 port-grid h-full">
+      {/* Port Grid - Contained within component */}
+      <div className="p-2 port-grid h-full patch-panel-background overflow-hidden">
         <div 
-          className="grid gap-0.5 h-full w-full"
+          className="grid gap-0.5 h-full w-full patch-panel-background"
           style={{ 
             gridTemplateColumns: `repeat(${cols}, 1fr)`,
             gridTemplateRows: `repeat(${rows}, 1fr)`
@@ -88,29 +90,32 @@ const PatchPanelComponent: React.FC<PatchPanelComponentProps> = ({
             const portLabel = component.portLabels?.find(pl => pl.portNumber === portNumber);
 
             return (
-              <button
+              <PortTooltip
                 key={portNumber}
-                onClick={(e) => handlePortClick(e, portNumber)}
-                className={`
-                  rounded border transition-all duration-150
-                  flex items-center justify-center font-medium
-                  hover:scale-105 active:scale-95 min-h-0
-                  ${hasLabel 
-                    ? 'bg-green-500 text-white border-green-600 hover:bg-green-600 shadow-sm' 
-                    : 'bg-white text-gray-600 border-gray-300 hover:bg-blue-50 hover:border-blue-300'
-                  }
-                `}
-                title={hasLabel 
-                  ? `Port ${portNumber}: ${portLabel?.label}${portLabel?.description ? ` - ${portLabel.description}` : ''}`
-                  : `Port ${portNumber}: Click to label`
-                }
-                style={{
-                  fontSize: '8px',
-                  lineHeight: '1'
-                }}
+                portNumber={portNumber}
+                portLabel={portLabel}
               >
-                {portNumber}
-              </button>
+                <button
+                  onClick={(e) => handlePortClick(e, portNumber)}
+                  className={`
+                    max-w-5 max-h-5 min-w-0 min-h-0 text-xs rounded border transition-all duration-150
+                    flex items-center justify-center font-medium mx-auto
+                    hover:scale-105 active:scale-95
+                    ${hasLabel 
+                      ? 'bg-green-500 text-white border-green-600 hover:bg-green-600 shadow-sm' 
+                      : 'bg-white text-gray-600 border-gray-300 hover:bg-blue-50 hover:border-blue-300'
+                    }
+                  `}
+                  style={{
+                    fontSize: '7px',
+                    lineHeight: '1',
+                    width: 'min(100%, 20px)',
+                    height: 'min(100%, 20px)'
+                  }}
+                >
+                  {portNumber}
+                </button>
+              </PortTooltip>
             );
           })}
         </div>
