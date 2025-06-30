@@ -16,6 +16,12 @@ const RackComponent: React.FC<RackComponentProps> = ({
   const [position, setPosition] = useState(component.position);
   const [imageError, setImageError] = useState(false);
 
+  const isPatchPanel = (comp: RackComponentType): boolean => {
+    return comp?.name?.toLowerCase().includes('keystone') && 
+           comp?.name?.toLowerCase().includes('patch') && 
+           comp?.name?.toLowerCase().includes('panel');
+  };
+
   // Snap back to original position if drop fails
   const handleSnapBack = () => {
     setPosition(component.position);
@@ -75,6 +81,12 @@ const RackComponent: React.FC<RackComponentProps> = ({
           <div className="text-xs text-gray-500 truncate">
             {component.specifications.manufacturer} {component.specifications.model}
           </div>
+          {/* Show port label count for patch panels */}
+          {isPatchPanel(component) && (
+            <div className="text-xs text-blue-600 truncate">
+              {component.portLabels?.length || 0}/{component.specifications.ports} ports labeled
+            </div>
+          )}
         </div>
       </div>
     </div>

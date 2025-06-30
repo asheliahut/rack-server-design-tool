@@ -4,6 +4,12 @@ export interface RackPosition {
   rackUnit: number; // 1U, 2U, etc.
 }
 
+export interface PortLabel {
+  portNumber: number;
+  label: string;
+  description?: string;
+}
+
 export interface RackComponent {
   id: string;
   name: string;
@@ -15,6 +21,7 @@ export interface RackComponent {
   imageUrl: string;
   specifications: ComponentSpecs;
   position?: RackPosition;
+  portLabels?: PortLabel[]; // For patch panels and other components with ports
 }
 
 export interface ComponentSpecs {

@@ -5,9 +5,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ComponentLibrary from '@/components/library/ComponentLibrary';
 import RackContainer from '@/components/rack/RackContainer';
 import Toolbar from '@/components/ui/Toolbar';
+import PatchPanelModal from '@/components/ui/PatchPanelModal';
 import { useRackDesign } from '@/hooks/useRackDesign';
 import { calculateRackStats } from '@/utils/rackCalculations';
 import { createPlaceholderSVG } from '@/utils/imageLoader';
+import { PortLabel } from '@/types/rack';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,6 +24,7 @@ function App() {
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const [isEditingComponentName, setIsEditingComponentName] = useState(false);
   const [editedComponentName, setEditedComponentName] = useState('');
+  const [isPatchPanelModalOpen, setIsPatchPanelModalOpen] = useState(false);
 
   const {
     currentDesign,
@@ -68,6 +71,23 @@ function App() {
     }
     setIsEditingComponentName(false);
     setEditedComponentName('');
+  };
+
+  const handleSavePortLabels = (portLabels: PortLabel[]) => {
+    if (selectedComponent) {
+      const updatedComponent = {
+        ...selectedComponent,
+        portLabels: portLabels
+      };
+      updateComponent(selectedComponent.id, updatedComponent);
+      setSelectedComponent(updatedComponent);
+    }
+  };
+
+  const isPatchPanel = (component: any): boolean => {
+    return component?.name?.toLowerCase().includes('keystone') && 
+           component?.name?.toLowerCase().includes('patch') && 
+           component?.name?.toLowerCase().includes('panel');
   };
 
   // Helper to update rack height in the design
@@ -302,19 +322,21 @@ function App() {
             
             {/* Properties Panel */}
             {selectedComponent && (
-              <div id="properties-panel" className="w-80 bg-white border-l border-gray-200 p-4 relative">
-                <button
-                  className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 focus:outline-none"
-                  title="Close"
-                  aria-label="Close details panel"
-                  onClick={() => setSelectedComponent(null)}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-                <h3 className="text-lg font-semibold mb-4">Component Details</h3>
-                <div className="space-y-4">
+              <div id="properties-panel" className="w-80 bg-white border-l border-gray-200 flex flex-col relative">
+                <div className="flex-shrink-0 relative p-4 border-b border-gray-200">
+                  <button
+                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 focus:outline-none"
+                    title="Close"
+                    aria-label="Close details panel"
+                    onClick={() => setSelectedComponent(null)}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                  <h3 className="text-lg font-semibold">Component Details</h3>
+                </div>
+                <div className="flex-1 overflow-y-auto p-3 space-y-3">
                   <div>
                     <img
                       src={
@@ -323,7 +345,7 @@ function App() {
                           : selectedComponent.imageUrl
                       }
                       alt={selectedComponent.name}
-                      className="w-full h-32 object-cover rounded-lg bg-gray-100"
+                      className="w-full h-24 object-cover rounded bg-gray-100"
                       onError={() => {
                         setImageErrors(prev => new Set(prev).add(selectedComponent.imageUrl));
                       }}
@@ -382,7 +404,7 @@ function App() {
                     )}
                     <p className="text-sm text-gray-600 capitalize">{selectedComponent.category}</p>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
                       <span className="text-gray-600">Height:</span>
                       <span className="ml-1 font-medium">{selectedComponent.height}U</span>
@@ -392,9 +414,9 @@ function App() {
                       <span className="ml-1 font-medium">{selectedComponent.width}%</span>
                     </div>
                   </div>
-                  <div className="border-t pt-4">
-                    <h5 className="font-medium text-gray-900 mb-2">Specifications</h5>
-                    <div className="space-y-1 text-sm">
+                  <div className="border-t pt-3">
+                    <h5 className="font-medium text-gray-900 mb-2 text-sm">Specifications</h5>
+                    <div className="space-y-1 text-xs">
                       <div>
                         <span className="text-gray-600">Manufacturer:</span>
                         <span className="ml-1">{selectedComponent.specifications.manufacturer}</span>
@@ -423,17 +445,73 @@ function App() {
                       )}
                     </div>
                   </div>
-                  {selectedComponent.position && (
-                    <div className="border-t pt-4">
-                      <h5 className="font-medium text-gray-900 mb-2">Position</h5>
-                      <div className="text-sm">
-                        <div>
-                          <span className="text-gray-600">Rack Unit:</span>
-                          <span className="ml-1">{selectedComponent.position.rackUnit}U</span>
+                  
+                  {/* Port Labeling for Patch Panels */}
+                  {isPatchPanel(selectedComponent) && (
+                    <div className="border-t pt-3">
+                      <div className="flex items-center justify-between mb-3">
+                        <h5 className="font-medium text-gray-900">Port Labels</h5>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                            {selectedComponent.portLabels?.length || 0} labeled
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            of {selectedComponent.specifications.ports}
+                          </span>
                         </div>
                       </div>
+                      
+                      {/* Enhanced Port Grid Preview */}
+                      {selectedComponent.specifications.ports && (
+                        <div className="mb-3 p-3 bg-gray-50 rounded border">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-medium text-gray-700">Port Status</span>
+                            <div className="flex items-center space-x-3 text-xs">
+                              <div className="flex items-center space-x-1">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span className="text-gray-600">Labeled</span>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                                <span className="text-gray-600">Empty</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-12 gap-1">
+                            {Array.from({ length: selectedComponent.specifications.ports }, (_, i) => {
+                              const portNumber = i + 1;
+                              const hasLabel = selectedComponent.portLabels?.some(pl => pl.portNumber === portNumber && pl.label.trim() !== '');
+                              const portLabel = selectedComponent.portLabels?.find(pl => pl.portNumber === portNumber);
+                              return (
+                                <div
+                                  key={portNumber}
+                                  className={`w-4 h-4 rounded flex items-center justify-center text-xs border cursor-help transition-colors ${
+                                    hasLabel 
+                                      ? 'bg-green-500 text-white border-green-600 hover:bg-green-600' 
+                                      : 'bg-white text-gray-500 border-gray-300 hover:bg-gray-50'
+                                  }`}
+                                  title={hasLabel ? `Port ${portNumber}: ${portLabel?.label}${portLabel?.description ? ` - ${portLabel.description}` : ''}` : `Port ${portNumber}: Click "Label Ports" to add labels`}
+                                >
+                                  {portNumber}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                      
+                      <button
+                        onClick={() => setIsPatchPanelModalOpen(true)}
+                        className="w-full px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        <span>Label Ports</span>
+                      </button>
                     </div>
                   )}
+                  
                   <button
                     id="remove-component-btn"
                     onClick={() => {
@@ -442,7 +520,7 @@ function App() {
                         setSelectedComponent(null);
                       }
                     }}
-                    className="w-full mt-4 px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                    className="w-full mt-3 px-2 py-1.5 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                   >
                     Remove Component
                   </button>
@@ -451,6 +529,16 @@ function App() {
             )}
           </div>
         </div>
+        
+        {/* Patch Panel Modal */}
+        {selectedComponent && isPatchPanel(selectedComponent) && (
+          <PatchPanelModal
+            isOpen={isPatchPanelModalOpen}
+            onClose={() => setIsPatchPanelModalOpen(false)}
+            component={selectedComponent}
+            onSave={handleSavePortLabels}
+          />
+        )}
       </DndProvider>
     </QueryClientProvider>
   );
