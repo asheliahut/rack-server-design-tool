@@ -35,7 +35,8 @@ const RackComponent: React.FC<RackComponentProps> = ({
     onSelect?.(component);
   };
 
-  const placeholderSvg = createPlaceholderSVG(32, 32, component.name, component.category);
+  const displayName = component.customName || component.name;
+  const placeholderSvg = createPlaceholderSVG(32, 32, displayName, component.category);
 
   return (
     <div
@@ -59,7 +60,7 @@ const RackComponent: React.FC<RackComponentProps> = ({
       <div className="p-2 h-full flex items-center">
         <img
           src={imageError ? placeholderSvg : component.imageUrl}
-          alt={component.name}
+          alt={displayName}
           className="w-8 h-8 object-contain mr-2 flex-shrink-0"
           onError={() => {
             if (!imageError) {
@@ -69,7 +70,7 @@ const RackComponent: React.FC<RackComponentProps> = ({
         />
         <div className="flex-1 min-w-0">
           <div className="text-xs font-medium text-gray-900 truncate">
-            {component.name}
+            {component.customName || component.name}
           </div>
           <div className="text-xs text-gray-500 truncate">
             {component.specifications.manufacturer} {component.specifications.model}

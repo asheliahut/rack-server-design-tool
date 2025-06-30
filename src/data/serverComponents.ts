@@ -930,9 +930,82 @@ export const accessoryComponents: RackComponent[] = [
   },
 ];
 
+// Generic Server Rack Components
+export const genericServerComponents: RackComponent[] = [
+  {
+    id: "generic-server-1u",
+    name: "Generic Server 1U",
+    category: "server",
+    height: 1,
+    width: 100,
+    depth: 2,
+    imageUrl: "/images/servers/generic-server-1u.jpg",
+    specifications: {
+      manufacturer: "Generic",
+      model: "Server 1U",
+      power: "300W",
+      ports: 2,
+      capacity: "Configurable",
+      weight: "8.0kg",
+    },
+  },
+  {
+    id: "generic-server-2u",
+    name: "Generic Server 2U",
+    category: "server",
+    height: 2,
+    width: 100,
+    depth: 2,
+    imageUrl: "/images/servers/generic-server-2u.jpg",
+    specifications: {
+      manufacturer: "Generic",
+      model: "Server 2U",
+      power: "600W",
+      ports: 4,
+      capacity: "Configurable",
+      weight: "15.0kg",
+    },
+  },
+  {
+    id: "generic-server-4u",
+    name: "Generic Server 4U",
+    category: "server",
+    height: 4,
+    width: 100,
+    depth: 2,
+    imageUrl: "/images/servers/generic-server-4u.jpg",
+    specifications: {
+      manufacturer: "Generic",
+      model: "Server 4U",
+      power: "1200W",
+      ports: 8,
+      capacity: "Configurable",
+      weight: "30.0kg",
+    },
+  },
+  {
+    id: "generic-server-8u",
+    name: "Generic Server 8U",
+    category: "server",
+    height: 8,
+    width: 100,
+    depth: 2,
+    imageUrl: "/images/servers/generic-server-8u.jpg",
+    specifications: {
+      manufacturer: "Generic",
+      model: "Server 8U",
+      power: "2400W",
+      ports: 16,
+      capacity: "Configurable",
+      weight: "60.0kg",
+    },
+  },
+];
+
 // Combined exports for easy importing
 export const allComponents = [
   ...serverComponents,
+  ...genericServerComponents,
   ...storageComponents,
   ...networkComponents,
   ...powerComponents,

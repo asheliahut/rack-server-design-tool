@@ -5,6 +5,7 @@ import { DragItem } from '@/types/design';
 import ComponentCard from './ComponentCard.js';
 import { 
   serverComponents,
+  genericServerComponents,
   storageComponents,
   networkComponents,
   powerComponents,
@@ -47,7 +48,7 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
   const getComponentsByCategory = (category: ComponentCategory): RackComponent[] => {
     switch (category) {
       case 'server':
-        return serverComponents;
+        return [...serverComponents, ...genericServerComponents];
       case 'storage':
         return storageComponents;
       case 'network':

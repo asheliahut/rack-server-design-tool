@@ -20,6 +20,8 @@ const queryClient = new QueryClient({
 
 function App() {
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  const [isEditingComponentName, setIsEditingComponentName] = useState(false);
+  const [editedComponentName, setEditedComponentName] = useState('');
 
   const {
     currentDesign,
@@ -41,6 +43,32 @@ function App() {
   if (pendingRackHeight !== currentDesign?.rackHeight) {
     setPendingRackHeight(currentDesign?.rackHeight || 42);
   }
+
+  // Helper functions for component name editing
+  const startEditingComponentName = () => {
+    if (selectedComponent) {
+      setEditedComponentName(selectedComponent.customName || selectedComponent.name);
+      setIsEditingComponentName(true);
+    }
+  };
+
+  const cancelEditingComponentName = () => {
+    setIsEditingComponentName(false);
+    setEditedComponentName('');
+  };
+
+  const saveComponentName = () => {
+    if (selectedComponent && editedComponentName.trim()) {
+      const updatedComponent = {
+        ...selectedComponent,
+        customName: editedComponentName.trim() !== selectedComponent.name ? editedComponentName.trim() : undefined
+      };
+      updateComponent(selectedComponent.id, updatedComponent);
+      setSelectedComponent(updatedComponent);
+    }
+    setIsEditingComponentName(false);
+    setEditedComponentName('');
+  };
 
   // Helper to update rack height in the design
   const handleRackHeightChange = (newHeight: number) => {
@@ -302,7 +330,56 @@ function App() {
                     />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900">{selectedComponent.name}</h4>
+                    <div className="flex items-center justify-between mb-1">
+                      {isEditingComponentName ? (
+                        <div className="flex-1 flex items-center space-x-2">
+                          <input
+                            type="text"
+                            value={editedComponentName}
+                            onChange={(e) => setEditedComponentName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') saveComponentName();
+                              if (e.key === 'Escape') cancelEditingComponentName();
+                            }}
+                            className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            autoFocus
+                            placeholder="Enter component name"
+                          />
+                          <button
+                            onClick={saveComponentName}
+                            className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none"
+                            title="Save name"
+                          >
+                            ✓
+                          </button>
+                          <button
+                            onClick={cancelEditingComponentName}
+                            className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 focus:outline-none"
+                            title="Cancel"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex-1 flex items-center justify-between">
+                          <h4 className="font-medium text-gray-900">
+                            {selectedComponent.customName || selectedComponent.name}
+                          </h4>
+                          <button
+                            onClick={startEditingComponentName}
+                            className="ml-2 p-1 text-gray-400 hover:text-gray-600 focus:outline-none"
+                            title="Edit component name"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    {selectedComponent.customName && (
+                      <p className="text-xs text-gray-500 mb-1">Original: {selectedComponent.name}</p>
+                    )}
                     <p className="text-sm text-gray-600 capitalize">{selectedComponent.category}</p>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-sm">

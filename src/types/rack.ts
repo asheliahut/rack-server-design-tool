@@ -7,6 +7,7 @@ export interface RackPosition {
 export interface RackComponent {
   id: string;
   name: string;
+  customName?: string; // User-defined custom name for the component
   category: ComponentCategory;
   height: number; // in rack units (1U, 2U, etc.)
   width: number; // percentage of rack width (25%, 50%, 100%)
