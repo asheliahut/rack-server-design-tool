@@ -1,5 +1,168 @@
 import { RackComponent } from "@/types/rack";
 
+// Generic Components (appear first in each category)
+// Generic Server Components
+export const genericServerComponents: RackComponent[] = [
+  {
+    id: "generic-server-1u",
+    name: "Generic Server 1U",
+    category: "server",
+    height: 1,
+    width: 100,
+    depth: 2,
+    imageUrl: "/images/servers/generic-server-1u.jpg",
+    specifications: {
+      manufacturer: "Generic",
+      model: "Server 1U",
+      power: "300W",
+      ports: 2,
+      capacity: "Configurable",
+      weight: "8.0kg",
+    },
+  },
+  {
+    id: "generic-server-2u",
+    name: "Generic Server 2U",
+    category: "server",
+    height: 2,
+    width: 100,
+    depth: 2,
+    imageUrl: "/images/servers/generic-server-2u.jpg",
+    specifications: {
+      manufacturer: "Generic",
+      model: "Server 2U",
+      power: "600W",
+      ports: 4,
+      capacity: "Configurable",
+      weight: "15.0kg",
+    },
+  },
+  {
+    id: "generic-server-4u",
+    name: "Generic Server 4U",
+    category: "server",
+    height: 4,
+    width: 100,
+    depth: 2,
+    imageUrl: "/images/servers/generic-server-4u.jpg",
+    specifications: {
+      manufacturer: "Generic",
+      model: "Server 4U",
+      power: "1200W",
+      ports: 8,
+      capacity: "Configurable",
+      weight: "30.0kg",
+    },
+  },
+  {
+    id: "generic-server-8u",
+    name: "Generic Server 8U",
+    category: "server",
+    height: 8,
+    width: 100,
+    depth: 2,
+    imageUrl: "/images/servers/generic-server-8u.jpg",
+    specifications: {
+      manufacturer: "Generic",
+      model: "Server 8U",
+      power: "2400W",
+      ports: 16,
+      capacity: "Configurable",
+      weight: "60.0kg",
+    },
+  },
+];
+
+// Generic Storage Components
+export const genericStorageComponents: RackComponent[] = [
+  {
+    id: "generic-storage-1u",
+    name: "Generic Storage 1U",
+    category: "storage",
+    height: 1,
+    width: 100,
+    depth: 2,
+    imageUrl: "/images/storage/generic-storage-1u.jpg",
+    specifications: {
+      manufacturer: "Generic",
+      model: "Storage 1U",
+      power: "250W",
+      capacity: "Configurable",
+      weight: "10.0kg",
+    },
+  },
+  {
+    id: "generic-storage-2u",
+    name: "Generic Storage 2U",
+    category: "storage",
+    height: 2,
+    width: 100,
+    depth: 2,
+    imageUrl: "/images/storage/generic-storage-2u.jpg",
+    specifications: {
+      manufacturer: "Generic",
+      model: "Storage 2U",
+      power: "450W",
+      capacity: "Configurable",
+      weight: "18.0kg",
+    },
+  },
+  {
+    id: "generic-storage-4u",
+    name: "Generic Storage 4U",
+    category: "storage",
+    height: 4,
+    width: 100,
+    depth: 2,
+    imageUrl: "/images/storage/generic-storage-4u.jpg",
+    specifications: {
+      manufacturer: "Generic",
+      model: "Storage 4U",
+      power: "800W",
+      capacity: "Configurable",
+      weight: "35.0kg",
+    },
+  },
+];
+
+// Generic Network Components
+export const genericNetworkComponents: RackComponent[] = [
+  {
+    id: "generic-switch-1u",
+    name: "Generic Switch 1U",
+    category: "network",
+    height: 1,
+    width: 100,
+    depth: 1,
+    imageUrl: "/images/network/generic-switch-1u.jpg",
+    specifications: {
+      manufacturer: "Generic",
+      model: "Switch 1U",
+      power: "150W",
+      ports: 24,
+      capacity: "Configurable",
+      weight: "5.0kg",
+    },
+  },
+  {
+    id: "generic-router-1u",
+    name: "Generic Router 1U",
+    category: "network",
+    height: 1,
+    width: 100,
+    depth: 1,
+    imageUrl: "/images/network/generic-router-1u.jpg",
+    specifications: {
+      manufacturer: "Generic",
+      model: "Router 1U",
+      power: "120W",
+      ports: 8,
+      capacity: "Configurable",
+      weight: "4.0kg",
+    },
+  },
+];
+
 // UniFi Rack-Mountable Components - 2025 Current Lineup
 export const unifiRackNetworkComponents: RackComponent[] = [
   // === GATEWAYS ===
@@ -650,6 +813,7 @@ export const allUniFiRackComponents = [
 ];
 
 export const serverComponents: RackComponent[] = [
+  ...genericServerComponents,
   {
     id: "dell-r750-1u",
     name: "Dell PowerEdge R750",
@@ -721,6 +885,7 @@ export const serverComponents: RackComponent[] = [
 ];
 
 export const storageComponents: RackComponent[] = [
+  ...genericStorageComponents,
   {
     id: "netapp-fas2750",
     name: "NetApp FAS2750",
@@ -759,6 +924,7 @@ export const storageComponents: RackComponent[] = [
 ];
 
 export const networkComponents: RackComponent[] = [
+  ...genericNetworkComponents,
   // Existing network components
   {
     id: "cisco-nexus-9300",
@@ -868,6 +1034,21 @@ export const accessoryComponents: RackComponent[] = [
     },
   },
   {
+    id: "brush-panel-1u",
+    name: "1U Brush Panel",
+    category: "blank",
+    height: 1,
+    width: 100,
+    depth: 0,
+    imageUrl: "/images/accessories/brush-panel-1u.jpg",
+    specifications: {
+      manufacturer: "Generic",
+      model: "1U Brush Panel",
+      weight: "0.3kg",
+      capacity: "Cable management",
+    },
+  },
+  {
     id: "blank-panel-2u",
     name: "2U Blank Panel",
     category: "blank",
@@ -930,82 +1111,9 @@ export const accessoryComponents: RackComponent[] = [
   },
 ];
 
-// Generic Server Rack Components
-export const genericServerComponents: RackComponent[] = [
-  {
-    id: "generic-server-1u",
-    name: "Generic Server 1U",
-    category: "server",
-    height: 1,
-    width: 100,
-    depth: 2,
-    imageUrl: "/images/servers/generic-server-1u.jpg",
-    specifications: {
-      manufacturer: "Generic",
-      model: "Server 1U",
-      power: "300W",
-      ports: 2,
-      capacity: "Configurable",
-      weight: "8.0kg",
-    },
-  },
-  {
-    id: "generic-server-2u",
-    name: "Generic Server 2U",
-    category: "server",
-    height: 2,
-    width: 100,
-    depth: 2,
-    imageUrl: "/images/servers/generic-server-2u.jpg",
-    specifications: {
-      manufacturer: "Generic",
-      model: "Server 2U",
-      power: "600W",
-      ports: 4,
-      capacity: "Configurable",
-      weight: "15.0kg",
-    },
-  },
-  {
-    id: "generic-server-4u",
-    name: "Generic Server 4U",
-    category: "server",
-    height: 4,
-    width: 100,
-    depth: 2,
-    imageUrl: "/images/servers/generic-server-4u.jpg",
-    specifications: {
-      manufacturer: "Generic",
-      model: "Server 4U",
-      power: "1200W",
-      ports: 8,
-      capacity: "Configurable",
-      weight: "30.0kg",
-    },
-  },
-  {
-    id: "generic-server-8u",
-    name: "Generic Server 8U",
-    category: "server",
-    height: 8,
-    width: 100,
-    depth: 2,
-    imageUrl: "/images/servers/generic-server-8u.jpg",
-    specifications: {
-      manufacturer: "Generic",
-      model: "Server 8U",
-      power: "2400W",
-      ports: 16,
-      capacity: "Configurable",
-      weight: "60.0kg",
-    },
-  },
-];
-
 // Combined exports for easy importing
 export const allComponents = [
   ...serverComponents,
-  ...genericServerComponents,
   ...storageComponents,
   ...networkComponents,
   ...powerComponents,
