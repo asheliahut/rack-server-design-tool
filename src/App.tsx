@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DndProvider } from 'react-dnd';
+import { DndProvider, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/contexts/ThemeContext';
@@ -12,6 +12,7 @@ import { useRackDesign } from '@/hooks/useRackDesign';
 import { calculateRackStats } from '@/utils/rackCalculations';
 import { createPlaceholderSVG } from '@/utils/imageLoader';
 import { PortLabel } from '@/types/rack';
+import { DragItem } from '@/types/design';
 import { ChevronRight } from 'lucide-react';
 
 const queryClient = new QueryClient({
@@ -22,6 +23,100 @@ const queryClient = new QueryClient({
   },
 });
 
+// Stats Panel component with drag-and-drop functionality
+interface StatsPanelProps {
+  rackStats: any;
+  currentDesign: any;
+  removeComponent: (id: string) => void;
+  isLibraryCollapsed: boolean;
+  setIsLibraryCollapsed: (collapsed: boolean) => void;
+}
+
+const StatsPanel: React.FC<StatsPanelProps> = ({ 
+  rackStats, 
+  currentDesign, 
+  removeComponent, 
+  isLibraryCollapsed, 
+  setIsLibraryCollapsed 
+}) => {
+  // Set up drop area for stats panel to remove components on mobile
+  const [{ isStatsDropOver, canStatsDropRemove }, statsDropRef] = useDrop<DragItem, void, { isStatsDropOver: boolean; canStatsDropRemove: boolean }>({
+    accept: 'component',
+    drop: (item, _monitor) => {
+      // Only remove if the item has a sourcePosition (meaning it's from the rack)
+      if (item.sourcePosition) {
+        removeComponent(item.component.id);
+      }
+    },
+    collect: (monitor) => ({
+      isStatsDropOver: monitor.isOver(),
+      canStatsDropRemove: monitor.canDrop() && !!monitor.getItem()?.sourcePosition,
+    }),
+  });
+
+  return (
+    <div className="flex">
+      {/* Collapsed Library Button */}
+      {isLibraryCollapsed && (
+        <div className="hidden lg:block w-12 bg-white dark:bg-gray-800 border-r border-gray-300 dark:border-gray-600 border-b border-gray-200 dark:border-gray-700 p-3 sm:p-4 transition-colors">
+          <button
+            onClick={() => setIsLibraryCollapsed(false)}
+            className="p-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+            title="Expand Component Library"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+      
+      {/* Stats Panel */}
+      <div 
+        ref={statsDropRef as unknown as React.Ref<HTMLDivElement>}
+        id="stats-panel" 
+        className={`flex-1 border-b border-gray-200 dark:border-gray-700 p-2 sm:p-4 transition-colors relative ${
+          isStatsDropOver && canStatsDropRemove 
+            ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-600' 
+            : 'bg-white dark:bg-gray-800'
+        }`}
+      >
+        {/* Drop Indicator for Mobile */}
+        {isStatsDropOver && canStatsDropRemove && (
+          <div className="lg:hidden absolute inset-0 bg-red-50 dark:bg-red-900/50 border-2 border-dashed border-red-400 dark:border-red-500 rounded-md flex items-center justify-center">
+            <div className="text-red-700 dark:text-red-300 font-medium text-sm flex items-center">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clipRule="evenodd" />
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 012 0v4a1 1 0 11-2 0V7zM8 13a1 1 0 012 0v.01a1 1 0 11-2 0V13z" clipRule="evenodd" />
+              </svg>
+              Drop here to remove component
+            </div>
+          </div>
+        )}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 sm:gap-4 text-xs sm:text-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1">
+          <span className="font-medium text-gray-900 dark:text-gray-100 text-xs sm:text-sm">Utilization:</span>
+          <span className="text-blue-600 dark:text-blue-400 font-semibold">{rackStats.utilizationPercentage.toFixed(1)}%</span>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1">
+          <span className="font-medium text-gray-900 dark:text-gray-100 text-xs sm:text-sm">Used Units:</span>
+          <span className="text-green-600 dark:text-green-400 font-semibold">{rackStats.usedUnits}/{currentDesign?.rackHeight}U</span>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1">
+          <span className="font-medium text-gray-900 dark:text-gray-100 text-xs sm:text-sm">Power:</span>
+          <span className="text-orange-600 dark:text-orange-400 font-semibold">{rackStats.totalPower}W</span>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1">
+          <span className="font-medium text-gray-900 dark:text-gray-100 text-xs sm:text-sm">Weight:</span>
+          <span className="text-purple-600 dark:text-purple-400 font-semibold">{rackStats.totalWeight.toFixed(1)}kg</span>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1">
+          <span className="font-medium text-gray-900 dark:text-gray-100 text-xs sm:text-sm">Components:</span>
+          <span className="text-gray-600 dark:text-gray-400 font-semibold">{rackStats.totalComponents}</span>
+        </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 function App() {
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
@@ -160,6 +255,7 @@ function App() {
   };
 
   const rackStats = currentDesign ? calculateRackStats(currentDesign) : null;
+
 
   const handleSave = () => {
     if (currentDesign) {
@@ -301,46 +397,13 @@ function App() {
             >
               {/* Stats Panel with Collapsed Library - Responsive grid layout */}
               {rackStats && (
-                <div className="flex">
-                  {/* Collapsed Library Button */}
-                  {isLibraryCollapsed && (
-                    <div className="hidden lg:block w-12 bg-white dark:bg-gray-800 border-r border-gray-300 dark:border-gray-600 border-b border-gray-200 dark:border-gray-700 p-3 sm:p-4 transition-colors">
-                      <button
-                        onClick={() => setIsLibraryCollapsed(false)}
-                        className="p-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                        title="Expand Component Library"
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                  
-                  {/* Stats Panel */}
-                  <div id="stats-panel" className="flex-1 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-2 sm:p-4 transition-colors">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 sm:gap-4 text-xs sm:text-sm">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1">
-                      <span className="font-medium text-gray-900 dark:text-gray-100 text-xs sm:text-sm">Utilization:</span>
-                      <span className="text-blue-600 dark:text-blue-400 font-semibold">{rackStats.utilizationPercentage.toFixed(1)}%</span>
-                    </div>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1">
-                      <span className="font-medium text-gray-900 dark:text-gray-100 text-xs sm:text-sm">Used Units:</span>
-                      <span className="text-green-600 dark:text-green-400 font-semibold">{rackStats.usedUnits}/{currentDesign?.rackHeight}U</span>
-                    </div>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1">
-                      <span className="font-medium text-gray-900 dark:text-gray-100 text-xs sm:text-sm">Power:</span>
-                      <span className="text-orange-600 dark:text-orange-400 font-semibold">{rackStats.totalPower}W</span>
-                    </div>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1">
-                      <span className="font-medium text-gray-900 dark:text-gray-100 text-xs sm:text-sm">Weight:</span>
-                      <span className="text-purple-600 dark:text-purple-400 font-semibold">{rackStats.totalWeight.toFixed(1)}kg</span>
-                    </div>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1">
-                      <span className="font-medium text-gray-900 dark:text-gray-100 text-xs sm:text-sm">Components:</span>
-                      <span className="text-gray-600 dark:text-gray-400 font-semibold">{rackStats.totalComponents}</span>
-                    </div>
-                    </div>
-                  </div>
-                </div>
+                <StatsPanel
+                  rackStats={rackStats}
+                  currentDesign={currentDesign}
+                  removeComponent={removeComponent}
+                  isLibraryCollapsed={isLibraryCollapsed}
+                  setIsLibraryCollapsed={setIsLibraryCollapsed}
+                />
               )}
               
               {/* Design Canvas - Scrollable with centered content */}

@@ -185,7 +185,6 @@ const RackContainer: React.FC<RackContainerProps> = ({
         className={`
           relative bg-rack-frame dark:bg-rack-frame-dark rounded-lg p-3 sm:p-4 lg:p-6
           transition-colors duration-200 shadow-lg w-full
-          ${isOver ? 'bg-blue-50 dark:bg-blue-900/50' : ''}
         `}
         style={{
           minHeight: rackHeight_px + 24, // Responsive padding
@@ -238,10 +237,6 @@ const RackContainer: React.FC<RackContainerProps> = ({
           })}
         </div>
         
-        {/* Drop overlay when dragging */}
-        {isOver && draggedItem && (
-          <div className="absolute inset-2 border-2 border-dashed border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/50 opacity-40 rounded-md pointer-events-none" />
-        )}
         
         {/* Rack frame decoration */}
         <div className="absolute inset-0 border-4 border-gray-800 dark:border-gray-400 rounded-lg pointer-events-none">
