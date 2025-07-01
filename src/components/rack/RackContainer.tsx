@@ -183,58 +183,63 @@ const RackContainer: React.FC<RackContainerProps> = ({
       <div
         ref={dropRef}
         className={`
-          relative bg-rack-frame dark:bg-rack-frame-dark rounded-lg p-3 sm:p-4 lg:p-6
+          relative bg-rack-frame dark:bg-rack-frame-dark rounded-lg p-2
           transition-colors duration-200 shadow-lg w-full
         `}
         style={{
-          minHeight: rackHeight_px + 24, // Responsive padding
+          minHeight: rackHeight_px + 16, // Reduced padding
         }}
       >
         {/* Snap Guides */}
         <SnapGuides guides={snapGuides} rackHeight={rackHeight} />
         
-        {/* Rack Unit Labels */}
-        <div className="absolute left-1 sm:left-2 top-3 sm:top-4 lg:top-6 w-8 sm:w-10 h-full">
-          {Array.from({ length: rackHeight }, (_, index) => {
-            const unitNumber = rackHeight - index;
-            return (
-              <div
-                key={unitNumber}
-                className="flex items-center justify-center text-xs font-mono text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-sm relative shadow-sm"
-                style={{ height: RACK_UNIT_HEIGHT }}
-              >
-                <span className="font-bold text-gray-700 dark:text-gray-200 text-xs">{unitNumber}</span>
-              </div>
-            );
-          })}
-        </div>
-        
-        {/* Main rack area */}
-        <div ref={rackAreaRef} className="ml-10 sm:ml-12 lg:ml-14 mr-3 sm:mr-4 lg:mr-6 relative overflow-hidden">
-          {/* Rack Grid Background - positioned within this container */}
-          <RackGrid rackHeight={rackHeight} gridVisible={true} />
-          
-          {/* Render rack units - components are now rendered within each unit */}
-          {Array.from({ length: rackHeight }, (_, index) => {
-            const unitNumber = rackHeight - index;
-            const unitComponents = components.filter(c => {
-              if (!c.position) return false;
-              // Check if component starts at this unit or spans across it
-              const componentStartUnit = c.position.rackUnit;
-              const componentEndUnit = c.position.rackUnit - c.height + 1;
-              return unitNumber <= componentStartUnit && unitNumber >= componentEndUnit;
-            });
+        {/* Centered rack content container */}
+        <div className="flex items-start justify-center h-full pt-2 pb-2">
+          <div className="flex items-start">
+            {/* Rack Unit Labels */}
+            <div className="w-8 sm:w-10 h-full">
+              {Array.from({ length: rackHeight }, (_, index) => {
+                const unitNumber = rackHeight - index;
+                return (
+                  <div
+                    key={unitNumber}
+                    className="flex items-center justify-center text-xs font-mono text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-sm relative shadow-sm"
+                    style={{ height: RACK_UNIT_HEIGHT }}
+                  >
+                    <span className="font-bold text-gray-700 dark:text-gray-200 text-xs">{unitNumber}</span>
+                  </div>
+                );
+              })}
+            </div>
             
-            return (
-              <RackUnit
-                key={unitNumber}
-                unitNumber={unitNumber}
-                components={unitComponents}
-                onComponentSelect={onComponentSelect}
-                onPortClick={onPortClick}
-              />
-            );
-          })}
+            {/* Main rack area */}
+            <div ref={rackAreaRef} className="w-96 sm:w-[500px] lg:w-[600px] relative overflow-hidden ml-1 mr-1">
+              {/* Rack Grid Background - positioned within this container */}
+              <RackGrid rackHeight={rackHeight} gridVisible={true} />
+              
+              {/* Render rack units - components are now rendered within each unit */}
+              {Array.from({ length: rackHeight }, (_, index) => {
+                const unitNumber = rackHeight - index;
+                const unitComponents = components.filter(c => {
+                  if (!c.position) return false;
+                  // Check if component starts at this unit or spans across it
+                  const componentStartUnit = c.position.rackUnit;
+                  const componentEndUnit = c.position.rackUnit - c.height + 1;
+                  return unitNumber <= componentStartUnit && unitNumber >= componentEndUnit;
+                });
+                
+                return (
+                  <RackUnit
+                    key={unitNumber}
+                    unitNumber={unitNumber}
+                    components={unitComponents}
+                    onComponentSelect={onComponentSelect}
+                    onPortClick={onPortClick}
+                  />
+                );
+              })}
+            </div>
+          </div>
         </div>
         
         

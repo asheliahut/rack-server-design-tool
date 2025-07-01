@@ -296,38 +296,18 @@ function App() {
                 <div className="min-h-full flex flex-col items-center py-4 sm:py-6 lg:py-8">
                   <div className="w-full max-w-6xl px-2 sm:px-4 lg:px-8">
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 sm:p-4 lg:p-6 transition-colors">
-                      <div className="mb-6">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
-                          <Input
-                            value={currentDesign?.name || ''}
-                            onChange={e => {
-                              if (currentDesign) {
-                                loadDesign({
-                                  ...currentDesign,
-                                  name: e.target.value,
-                                  updatedAt: new Date(),
-                                });
-                              }
-                            }}
-                            variant="inline"
-                            className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 w-full"
-                            style={{ minWidth: 120 }}
-                            aria-label="Design Name"
-                          />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <label htmlFor="rack-height-input" className="text-sm text-gray-600 dark:text-gray-400 font-medium">Rack Height:</label>
-                          <Input
-                            id="rack-height-input"
-                            type="number"
-                            min={1}
-                            max={55}
-                            value={pendingRackHeight.toString()}
-                            onChange={e => handleRackHeightChange(Number(e.target.value))}
-                            className="w-16 sm:w-20 text-sm"
-                          />
-                          <span className="text-sm text-gray-600 dark:text-gray-400">U</span>
-                        </div>
+                      <div className="mb-6 flex items-center gap-2 justify-center">
+                        <label htmlFor="rack-height-input" className="text-sm text-gray-600 dark:text-gray-400 font-medium">Rack Height:</label>
+                        <Input
+                          id="rack-height-input"
+                          type="number"
+                          min={1}
+                          max={55}
+                          value={pendingRackHeight.toString()}
+                          onChange={e => handleRackHeightChange(Number(e.target.value))}
+                          className="w-16 sm:w-20 text-sm text-center"
+                        />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">U</span>
                       </div>
                       
                       <div className="flex justify-center">
