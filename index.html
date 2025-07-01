@@ -5,6 +5,42 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + React + TS</title>
+    <script>
+      // Prevent dark mode flash by applying theme before React loads
+      (function() {
+        function getTheme() {
+          // Check localStorage first
+          const savedTheme = localStorage.getItem('theme');
+          if (savedTheme === 'dark' || savedTheme === 'light') {
+            return savedTheme;
+          }
+          
+          // Check system preference
+          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark';
+          }
+          
+          return 'light';
+        }
+        
+        const theme = getTheme();
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+        
+        // Set meta theme-color for mobile browsers
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if (metaThemeColor) {
+          metaThemeColor.setAttribute('content', theme === 'dark' ? '#1f2937' : '#ffffff');
+        } else {
+          // Create meta theme-color if it doesn't exist
+          const meta = document.createElement('meta');
+          meta.name = 'theme-color';
+          meta.content = theme === 'dark' ? '#1f2937' : '#ffffff';
+          document.head.appendChild(meta);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
