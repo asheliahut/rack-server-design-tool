@@ -45,7 +45,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
       }}
       onClick={handleClick}
       className={`
-        relative bg-white dark:bg-gray-700 border rounded-lg p-3 cursor-grab transition-all duration-200 ease-in-out w-full
+        relative bg-white dark:bg-gray-700 border rounded-lg p-2 sm:p-3 cursor-grab transition-all duration-200 ease-in-out w-full
         hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500 hover:-translate-y-0.5 active:scale-95 active:cursor-grabbing
         ${isSelected ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-400' : 'border-gray-200 dark:border-gray-600'}
         ${isDragging ? 'opacity-50 scale-105 rotate-2 shadow-lg pointer-events-none z-50' : ''}
@@ -59,8 +59,8 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
       )}
 
       {/* Component Image */}
-      <div className="flex items-start space-x-3">
-        <div className="w-16 h-10 bg-gray-100 dark:bg-gray-600 rounded border border-gray-200 dark:border-gray-500 flex-shrink-0 overflow-hidden">
+      <div className="flex items-start space-x-2 sm:space-x-3">
+        <div className="w-12 sm:w-16 h-8 sm:h-10 bg-gray-100 dark:bg-gray-600 rounded border border-gray-200 dark:border-gray-500 flex-shrink-0 overflow-hidden">
           <img
             src={imageError ? placeholderSvg : component.imageUrl}
             alt={component.name}
@@ -76,11 +76,11 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
         {/* Component Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+            <h3 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
               {component.name}
             </h3>
             <span className={`
-              inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ml-2
+              inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-xs font-medium border ml-1 sm:ml-2 flex-shrink-0
               ${getCategoryColor(component.category)}
             `}>
               {component.category}
@@ -92,7 +92,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
           </p>
           
           {/* Component Stats */}
-          <div className="flex items-center space-x-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex items-center space-x-2 sm:space-x-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
             <span className="flex items-center">
               <span className="w-2 h-2 bg-gray-400 rounded mr-1" />
               {component.height}U

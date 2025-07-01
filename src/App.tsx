@@ -12,6 +12,7 @@ import { useRackDesign } from '@/hooks/useRackDesign';
 import { calculateRackStats } from '@/utils/rackCalculations';
 import { createPlaceholderSVG } from '@/utils/imageLoader';
 import { PortLabel } from '@/types/rack';
+import { ChevronRight } from 'lucide-react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,6 +31,7 @@ function App() {
   const [isSinglePortModalOpen, setIsSinglePortModalOpen] = useState(false);
   const [selectedPortComponent, setSelectedPortComponent] = useState<any>(null);
   const [selectedPortNumber, setSelectedPortNumber] = useState<number>(0);
+  const [isLibraryCollapsed, setIsLibraryCollapsed] = useState(false);
 
   const {
     currentDesign,
@@ -277,99 +279,139 @@ function App() {
             }}
           />
           
-          <div id="main-layout" className="flex-1 flex overflow-hidden">
-            {/* Component Library Sidebar */}
-            <ComponentLibrary 
-              onComponentSelect={setSelectedComponent}
-              onComponentRemove={removeComponent}
-              selectedCategory="server"
-            />
+          <div id="main-layout" className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+            {/* Desktop Component Library Sidebar - Only when not collapsed */}
+            {!isLibraryCollapsed && (
+              <div className="hidden lg:block lg:w-80 lg:flex-shrink-0">
+                <ComponentLibrary 
+                  onComponentSelect={setSelectedComponent}
+                  onComponentRemove={removeComponent}
+                  selectedCategory="server"
+                  isCollapsed={isLibraryCollapsed}
+                  onToggleCollapse={setIsLibraryCollapsed}
+                />
+              </div>
+            )}
             
             {/* Main Design Area */}
-            <div id="design-area" className="flex-1 flex flex-col">
-              {/* Stats Panel */}
+            <div 
+              id="design-area" 
+              className={`flex-1 flex flex-col min-w-0 relative overflow-hidden ${selectedComponent ? 'lg:mr-80' : ''}`}
+              style={{ minHeight: '0' }} // Ensures proper flex behavior
+            >
+              {/* Stats Panel with Collapsed Library - Responsive grid layout */}
               {rackStats && (
-                <div id="stats-panel" className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-6 text-sm">
-                      <span className="font-medium text-gray-900 dark:text-gray-100">
-                        Utilization: <span className="text-blue-600 dark:text-blue-400">{rackStats.utilizationPercentage.toFixed(1)}%</span>
-                      </span>
-                      <span className="font-medium text-gray-900 dark:text-gray-100">
-                        Used Units: <span className="text-green-600 dark:text-green-400">{rackStats.usedUnits}/{currentDesign?.rackHeight}U</span>
-                      </span>
-                      <span className="font-medium text-gray-900 dark:text-gray-100">
-                        Power: <span className="text-orange-600 dark:text-orange-400">{rackStats.totalPower}W</span>
-                      </span>
-                      <span className="font-medium text-gray-900 dark:text-gray-100">
-                        Weight: <span className="text-purple-600 dark:text-purple-400">{rackStats.totalWeight.toFixed(1)}kg</span>
-                      </span>
-                      <span className="font-medium text-gray-900 dark:text-gray-100">
-                        Components: <span className="text-gray-600 dark:text-gray-400">{rackStats.totalComponents}</span>
-                      </span>
+                <div className="flex">
+                  {/* Collapsed Library Button */}
+                  {isLibraryCollapsed && (
+                    <div className="hidden lg:block w-12 bg-white dark:bg-gray-800 border-r border-gray-300 dark:border-gray-600 border-b border-gray-200 dark:border-gray-700 p-3 sm:p-4 transition-colors">
+                      <button
+                        onClick={() => setIsLibraryCollapsed(false)}
+                        className="p-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                        title="Expand Component Library"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  
+                  {/* Stats Panel */}
+                  <div id="stats-panel" className="flex-1 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-2 sm:p-4 transition-colors">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 sm:gap-4 text-xs sm:text-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1">
+                      <span className="font-medium text-gray-900 dark:text-gray-100 text-xs sm:text-sm">Utilization:</span>
+                      <span className="text-blue-600 dark:text-blue-400 font-semibold">{rackStats.utilizationPercentage.toFixed(1)}%</span>
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1">
+                      <span className="font-medium text-gray-900 dark:text-gray-100 text-xs sm:text-sm">Used Units:</span>
+                      <span className="text-green-600 dark:text-green-400 font-semibold">{rackStats.usedUnits}/{currentDesign?.rackHeight}U</span>
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1">
+                      <span className="font-medium text-gray-900 dark:text-gray-100 text-xs sm:text-sm">Power:</span>
+                      <span className="text-orange-600 dark:text-orange-400 font-semibold">{rackStats.totalPower}W</span>
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1">
+                      <span className="font-medium text-gray-900 dark:text-gray-100 text-xs sm:text-sm">Weight:</span>
+                      <span className="text-purple-600 dark:text-purple-400 font-semibold">{rackStats.totalWeight.toFixed(1)}kg</span>
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1">
+                      <span className="font-medium text-gray-900 dark:text-gray-100 text-xs sm:text-sm">Components:</span>
+                      <span className="text-gray-600 dark:text-gray-400 font-semibold">{rackStats.totalComponents}</span>
+                    </div>
                     </div>
                   </div>
                 </div>
               )}
               
-              {/* Design Canvas */}
-              <div id="canvas-container" className="flex-1 overflow-auto scrollbar-thin">
-                <div className="p-8 min-h-full flex justify-center items-start">
-                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-colors">
-                <div className="mb-4">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={currentDesign?.name || ''}
-                      onChange={e => {
-                        if (currentDesign) {
-                          loadDesign({
-                            ...currentDesign,
-                            name: e.target.value,
-                            updatedAt: new Date(),
-                          });
-                        }
-                      }}
-                      className="text-lg font-semibold text-gray-800 dark:text-gray-200 input-inline w-full"
-                      style={{ minWidth: 120 }}
-                      aria-label="Design Name"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <label htmlFor="rack-height-input" className="text-sm text-gray-600 dark:text-gray-400 font-medium">Rack Height:</label>
-                    <input
-                      id="rack-height-input"
-                      type="number"
-                      min={1}
-                      max={55}
-                      value={pendingRackHeight}
-                      onChange={e => handleRackHeightChange(Number(e.target.value))}
-                      className="w-20 input-standard text-sm"
-                      style={{ width: 60 }}
-                    />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">U</span>
-                  </div>
-                </div>
-                    
-                    <RackContainer
-                      components={currentDesign?.components || []}
-                      rackHeight={currentDesign?.rackHeight || 42}
-                      onComponentDrop={addComponent}
-                      onComponentMove={moveComponent}
-                      onComponentSelect={setSelectedComponent}
-                      onPortClick={handlePortClick}
-                    />
+              {/* Design Canvas - Scrollable with centered content */}
+              <div 
+                id="canvas-container" 
+                className="flex-1 overflow-auto scrollbar-thin" 
+                style={{ 
+                  WebkitOverflowScrolling: 'touch',
+                  minHeight: '0' // Ensures flex child can shrink and create scrollable area
+                }}
+              >
+                <div className="min-h-full flex flex-col items-center py-4 sm:py-6 lg:py-8">
+                  <div className="w-full max-w-6xl px-2 sm:px-4 lg:px-8">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 sm:p-4 lg:p-6 transition-colors">
+                      <div className="mb-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
+                          <input
+                            type="text"
+                            value={currentDesign?.name || ''}
+                            onChange={e => {
+                              if (currentDesign) {
+                                loadDesign({
+                                  ...currentDesign,
+                                  name: e.target.value,
+                                  updatedAt: new Date(),
+                                });
+                              }
+                            }}
+                            className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 input-inline w-full"
+                            style={{ minWidth: 120 }}
+                            aria-label="Design Name"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <label htmlFor="rack-height-input" className="text-sm text-gray-600 dark:text-gray-400 font-medium">Rack Height:</label>
+                          <input
+                            id="rack-height-input"
+                            type="number"
+                            min={1}
+                            max={55}
+                            value={pendingRackHeight}
+                            onChange={e => handleRackHeightChange(Number(e.target.value))}
+                            className="w-16 sm:w-20 input-standard text-sm"
+                          />
+                          <span className="text-sm text-gray-600 dark:text-gray-400">U</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-center">
+                        <RackContainer
+                          components={currentDesign?.components || []}
+                          rackHeight={currentDesign?.rackHeight || 42}
+                          onComponentDrop={addComponent}
+                          onComponentMove={moveComponent}
+                          onComponentSelect={setSelectedComponent}
+                          onPortClick={handlePortClick}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
             
-            {/* Properties Panel */}
+            {/* Properties Panel - Mobile: Full overlay, Desktop: Fixed right sidebar */}
             {selectedComponent && (
-              <div id="properties-panel" className="w-80 panel-base relative">
-                <div className="flex-shrink-0 relative p-4 border-b border-gray-200">
+              <div id="properties-panel" className="fixed inset-0 z-50 lg:top-16 lg:bottom-0 lg:right-0 lg:left-auto lg:w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-xl lg:border-l lg:shadow-lg">
+                <div className="flex-shrink-0 relative p-4 border-b border-gray-200 dark:border-gray-700">
                   <button
-                    className="absolute top-2 right-2 btn-icon"
+                    className="absolute top-2 right-2 btn-icon lg:btn-icon"
                     title="Close"
                     aria-label="Close details panel"
                     onClick={() => setSelectedComponent(null)}
@@ -572,7 +614,17 @@ function App() {
               </div>
             )}
           </div>
-        </div>
+
+          {/* Mobile Floating Component Library */}
+          <div className="lg:hidden">
+            <ComponentLibrary 
+              onComponentSelect={setSelectedComponent}
+              onComponentRemove={removeComponent}
+              selectedCategory="server"
+              isCollapsed={false}
+              onToggleCollapse={() => {}}
+            />
+          </div>
         
         {/* Patch Panel Modal */}
         {selectedComponent && isPatchPanel(selectedComponent) && (

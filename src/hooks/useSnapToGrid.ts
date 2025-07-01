@@ -7,8 +7,6 @@ export const useSnapToGrid = (rackHeight: number) => {
   const [snapGuides, setSnapGuides] = useState<SnapGuide[]>([]);
 
   const RACK_UNIT_HEIGHT = 44; // pixels
-  // New component area width: total width (720) - ml-14 (56) - mr-6 (24) - px-2 left (8) - px-2 right (8) = 624px
-  const COMPONENT_AREA_WIDTH = 624;
 
   const generateSnapPoints = useCallback((): SnapPoint[] => {
     const points: SnapPoint[] = [];
@@ -20,14 +18,6 @@ export const useSnapToGrid = (rackHeight: number) => {
         y: (rackHeight - unit) * RACK_UNIT_HEIGHT,
         rackUnit: unit,
         isOccupied: false, // TODO: Check against existing components
-      });
-
-      // Half width positions
-      points.push({
-        x: COMPONENT_AREA_WIDTH / 2,
-        y: (rackHeight - unit) * RACK_UNIT_HEIGHT,
-        rackUnit: unit,
-        isOccupied: false,
       });
     }
 
@@ -53,13 +43,12 @@ export const useSnapToGrid = (rackHeight: number) => {
 
         // Update snap guides
         const componentHeight = component.height * RACK_UNIT_HEIGHT;
-        const componentWidth = component.width === 100 ? COMPONENT_AREA_WIDTH : COMPONENT_AREA_WIDTH / 2;
 
         const guides: SnapGuide[] = [
           {
             x: 0, // SnapGuides component handles positioning
             y: snapY,
-            width: componentWidth,
+            width: 0, // SnapGuides component handles responsive width
             height: componentHeight,
             rackUnit: rackUnit,
             visible: true,
@@ -81,13 +70,12 @@ export const useSnapToGrid = (rackHeight: number) => {
 
       if (snapPoint) {
         const componentHeight = component.height * RACK_UNIT_HEIGHT;
-        const componentWidth = component.width === 100 ? COMPONENT_AREA_WIDTH : COMPONENT_AREA_WIDTH / 2;
 
         const guides: SnapGuide[] = [
           {
             x: 0,
             y: snapPoint.y,
-            width: componentWidth,
+            width: 0, // SnapGuides component handles responsive width
             height: componentHeight,
             rackUnit: snapPoint.rackUnit,
             visible: true,

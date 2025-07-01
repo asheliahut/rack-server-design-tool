@@ -6,29 +6,24 @@ interface SnapGuidesProps {
   rackHeight?: number;
 }
 
-const SnapGuides: React.FC<SnapGuidesProps> = ({ guides, rackHeight = 42 }) => {
+const SnapGuides: React.FC<SnapGuidesProps> = ({ guides }) => {
   return (
     <div className="absolute inset-0 pointer-events-none z-20">
       {guides.map((guide, index) => (
         <div key={index}>
           {guide.visible && (
             <>
-              {/* Main snap guide rectangle - align with component area */}
+              {/* Main snap guide rectangle - align with actual component area */}
               <div
-                className="absolute border-2 border-dashed border-blue-400 rounded transition-all duration-150"
+                className="absolute border-2 border-dashed border-blue-400 rounded transition-all duration-150 left-16 sm:left-18 lg:left-20 right-9 sm:right-10 lg:right-12 top-3 sm:top-4 lg:top-6"
                 style={{
-                  // Align with the component area: ml-14 (56px) + px-2 (8px) = 64px from left
-                  left: 64,
-                  top: 24 + (guide.y || 0), // Account for container padding (p-6 = 24px)
-                  // Component area width: total width (720) - ml-14 (56) - mr-6 (24) - px-2 left (8) - px-2 right (8) = 624px
-                  width: 624,
+                  marginTop: `${guide.y || 0}px`, // Use margin-top to add to the responsive top positioning
                   height: guide.height,
-                  backgroundColor: 'transparent',
                 }}
               >
-                {/* Rack unit indicator - positioned outside the rack area */}
-                <div className="absolute -left-16 top-0 bg-blue-500 text-white text-xs px-2 py-1 rounded text-center font-mono shadow-lg z-50">
-                  {guide.rackUnit || rackHeight - Math.floor((guide.y - 16) / 44)}U
+                {/* Rack unit indicator */}
+                <div className="absolute -left-8 sm:-left-10 lg:-left-12 top-0 bg-blue-500 text-white text-xs px-1.5 sm:px-2 py-1 rounded font-mono shadow-lg z-50">
+                  {guide.rackUnit}U
                 </div>
               </div>
             </>

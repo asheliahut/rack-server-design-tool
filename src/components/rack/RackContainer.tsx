@@ -6,7 +6,7 @@ import RackUnit from './RackUnit.js';
 import RackGrid from './RackGrid.js';
 import SnapGuides from '../design/SnapGuides.js';
 import { useSnapToGrid } from '@/hooks/useSnapToGrid.js';
-import { RACK_UNIT_HEIGHT, RACK_WIDTH_STANDARD, getRackUnitFromY } from '@/constants/rack';
+import { RACK_UNIT_HEIGHT, getRackUnitFromY } from '@/constants/rack';
 
 interface RackContainerProps {
   components: RackComponent[];
@@ -126,58 +126,76 @@ const RackContainer: React.FC<RackContainerProps> = ({
     }
   }, [isOver, draggedItem, clearSnapGuides]);
 
-  // Enable scroll wheel during drag by forcing it at the highest level
+  // Enable scroll during drag - wheel for desktop, touch for mobile
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       if (draggedItem) {
         // Stop event from being captured by React DnD
         e.stopImmediatePropagation();
         
-        // Force scroll the page
-        const scrollAmount = e.deltaY;
-        window.scrollTo({
-          top: window.scrollY + scrollAmount,
-          behavior: 'auto'
-        });
+        // Find the scrollable container
+        const scrollContainer = document.getElementById('canvas-container');
+        if (scrollContainer) {
+          scrollContainer.scrollTop += e.deltaY;
+        } else {
+          // Fallback to window scroll
+          window.scrollTo({
+            top: window.scrollY + e.deltaY,
+            behavior: 'auto'
+          });
+        }
+      }
+    };
+
+    const handleTouchMove = (_e: TouchEvent) => {
+      // Allow touch scrolling during drag on mobile
+      if (draggedItem) {
+        // Don't prevent default - allow natural touch scrolling
+        return;
       }
     };
 
     if (draggedItem) {
-      // Attach to document with highest priority and prevent other handlers
+      // Desktop: Override wheel behavior
       document.addEventListener('wheel', handleWheel, { 
         passive: false,
         capture: true 
       });
       
+      // Mobile: Allow touch scrolling
+      document.addEventListener('touchmove', handleTouchMove, { 
+        passive: true,
+        capture: false 
+      });
+      
       return () => {
         document.removeEventListener('wheel', handleWheel, { capture: true });
+        document.removeEventListener('touchmove', handleTouchMove, { capture: false });
       };
     }
   }, [draggedItem]);
 
-  // Calculate rack dimensions - made wider with better margins
-  const rackWidth = RACK_WIDTH_STANDARD; // Increased width for better component spacing
+  // Calculate rack dimensions - responsive width, fixed height
   const rackHeight_px = rackHeight * RACK_UNIT_HEIGHT; // rack units to pixels
 
   return (
-    <div className="relative">
+    <div className="relative w-full max-w-4xl">
       <div
         ref={dropRef}
         className={`
-          relative bg-rack-frame dark:bg-rack-frame-dark rounded-lg p-6
-          transition-colors duration-200 shadow-lg
+          relative bg-rack-frame dark:bg-rack-frame-dark rounded-lg p-3 sm:p-4 lg:p-6
+          transition-colors duration-200 shadow-lg w-full
           ${isOver ? 'bg-blue-50 dark:bg-blue-900/50' : ''}
         `}
         style={{
-          width: rackWidth,
-          minHeight: rackHeight_px + 48, // Increased padding
+          minHeight: rackHeight_px + 24, // Responsive padding
         }}
       >
         {/* Snap Guides */}
         <SnapGuides guides={snapGuides} rackHeight={rackHeight} />
         
         {/* Rack Unit Labels */}
-        <div className="absolute left-2 top-6 w-10 h-full">
+        <div className="absolute left-1 sm:left-2 top-3 sm:top-4 lg:top-6 w-8 sm:w-10 h-full">
           {Array.from({ length: rackHeight }, (_, index) => {
             const unitNumber = rackHeight - index;
             return (
@@ -186,14 +204,14 @@ const RackContainer: React.FC<RackContainerProps> = ({
                 className="flex items-center justify-center text-xs font-mono text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-sm relative shadow-sm"
                 style={{ height: RACK_UNIT_HEIGHT }}
               >
-                <span className="font-bold text-gray-700 dark:text-gray-200">{unitNumber}</span>
+                <span className="font-bold text-gray-700 dark:text-gray-200 text-xs">{unitNumber}</span>
               </div>
             );
           })}
         </div>
         
         {/* Main rack area */}
-        <div ref={rackAreaRef} className="ml-14 mr-6 relative overflow-hidden">
+        <div ref={rackAreaRef} className="ml-10 sm:ml-12 lg:ml-14 mr-3 sm:mr-4 lg:mr-6 relative overflow-hidden">
           {/* Rack Grid Background - positioned within this container */}
           <RackGrid rackHeight={rackHeight} gridVisible={true} />
           
