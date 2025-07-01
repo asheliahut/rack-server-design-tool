@@ -1,12 +1,13 @@
 import React from 'react';
-import { clsx } from 'clsx';
+import { cn } from '@/utils/cn';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'destructive';
   size?: 'xs' | 'sm' | 'md' | 'lg';
   loading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  icon?: React.ReactNode; // Single icon prop for convenience
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -15,6 +16,7 @@ const Button: React.FC<ButtonProps> = ({
   loading = false,
   leftIcon,
   rightIcon,
+  icon,
   children,
   className,
   disabled,
@@ -27,6 +29,7 @@ const Button: React.FC<ButtonProps> = ({
     secondary: 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600 focus:ring-gray-500 active:bg-gray-400 dark:active:bg-gray-500',
     ghost: 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-gray-500 active:bg-gray-200 dark:active:bg-gray-600',
     danger: 'bg-red-600 dark:bg-red-700 text-white hover:bg-red-700 dark:hover:bg-red-600 focus:ring-red-500 active:bg-red-800 dark:active:bg-red-800',
+    destructive: 'bg-red-600 dark:bg-red-700 text-white hover:bg-red-700 dark:hover:bg-red-600 focus:ring-red-500 active:bg-red-800 dark:active:bg-red-800',
   };
 
   const sizeClasses = {
@@ -36,12 +39,15 @@ const Button: React.FC<ButtonProps> = ({
     lg: 'px-6 py-3 text-base',
   };
 
-  const combinedClasses = clsx(
+  const combinedClasses = cn(
     baseClasses,
     variantClasses[variant],
     sizeClasses[size],
     className
   );
+
+  // Use icon as leftIcon if provided and no leftIcon is set
+  const displayLeftIcon = leftIcon || icon;
 
   return (
     <button
@@ -72,8 +78,8 @@ const Button: React.FC<ButtonProps> = ({
         </svg>
       )}
       
-      {!loading && leftIcon && (
-        <span className="mr-2">{leftIcon}</span>
+      {!loading && displayLeftIcon && (
+        <span className="mr-2">{displayLeftIcon}</span>
       )}
       
       {children}

@@ -41,7 +41,18 @@ This is a React-based drag-and-drop rack server design tool built with modern we
 - **Rack System**: `RackContainer` → `RackGrid` → individual rack units
 - **Component Library**: Category-based component browser with drag-and-drop
 - **Design Canvas**: Scrollable design area with snap-to-grid functionality
-- **Properties Panel**: Right sidebar for component details and configuration
+- **Reusable UI Components**: Comprehensive library in `src/components/ui/`
+  - `BaseModal`: Foundation for all modal dialogs
+  - `Button`: Unified button component with variants
+  - `Input`: Form input with label and validation support
+  - `IconButton`: Standardized icon buttons
+  - `StatsPanel`: Rack statistics with drag-and-drop removal
+  - `PropertiesPanel`: Component details and configuration
+  - `ResponsiveGrid`: Configurable responsive layouts
+  - `StatusIndicator`: Consistent status displays
+  - `CollapsibleSection`: Expandable content sections
+  - `ComponentSpecifications`: Flexible layout with flow, grid, and list modes
+  - `PortStatusGrid`: Responsive port visualization for components with ports
 
 #### Drag and Drop System
 - Uses React DnD with HTML5 backend
@@ -86,6 +97,16 @@ Uses Tailwind CSS with custom design tokens for:
 - Dark mode support throughout
 - Responsive grid systems for rack layout
 - Custom animations and transitions
+- Utility function `cn()` for class merging and conditional styling
+
+### New Component Patterns
+After refactoring, the application follows these improved patterns:
+- **Compound Components**: Complex UI built from smaller, focused components
+- **Prop-based Variants**: Consistent styling through variant systems
+- **Centralized UI Library**: All reusable components in `src/components/ui/`
+- **Type-safe Props**: Full TypeScript coverage with proper prop interfaces
+- **Accessibility First**: ARIA labels and keyboard navigation support
+- **Compact Design**: Optimized layouts for efficient space usage with better horizontal alignment
 
 ## Development Notes
 
