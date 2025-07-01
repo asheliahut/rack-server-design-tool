@@ -76,37 +76,49 @@ const RackContainer: React.FC<RackContainerProps> = ({
         const componentEndUnit = targetRackUnit - item.component.height + 1;
         const fitsInRack = componentEndUnit >= 1; // Component must not extend below unit 1
         
-        // Check if position is valid (no overlaps with existing components)
-        const noOverlaps = !components.some(existing => {
+        // Find components that would overlap with the dropped component
+        const overlappingComponents = components.filter(existing => {
           if (!existing.position || existing.id === item.component.id) return false;
-          const existingStart = existing.position.rackUnit;
-          const existingEnd = existing.position.rackUnit - existing.height + 1;
-          const newStart = targetRackUnit;
-          const newEnd = componentEndUnit;
           
-          // Check for overlap
-          return !(newEnd > existingStart || newStart < existingEnd);
+          // Define the ranges more clearly - rack units count from top to bottom
+          const existingTopUnit = existing.position.rackUnit;
+          const existingBottomUnit = existing.position.rackUnit - existing.height + 1;
+          const newTopUnit = targetRackUnit;
+          const newBottomUnit = targetRackUnit - item.component.height + 1;
+          
+          // Two ranges overlap if: max(start1, start2) <= min(end1, end2)
+          // Since units count down, we need to check bottom-to-top overlap
+          const overlapStart = Math.max(newBottomUnit, existingBottomUnit);
+          const overlapEnd = Math.min(newTopUnit, existingTopUnit);
+          
+          const overlaps = overlapStart <= overlapEnd;
+          
+          return overlaps;
         });
         
-        const canPlace = fitsInRack && noOverlaps;
-        
-        if (canPlace) {
+        if (fitsInRack) {
           const position: RackPosition = {
             x: 0, // Not needed for relative positioning
             y: 0, // Not needed for relative positioning  
             rackUnit: targetRackUnit,
           };
 
-          if (item.sourcePosition) {
-            // Moving existing component
-            onComponentMove(item.component.id, position);
+          if (overlappingComponents.length > 0) {
+            // Handle component swapping/shifting - always attempt to swap
+            handleComponentSwap(item, position, overlappingComponents);
           } else {
-            // Adding new component - create a new component with unique ID
-            const newComponent = {
-              ...item.component,
-              id: `${item.component.id}-${Date.now()}`,
-            };
-            onComponentDrop(newComponent, position);
+            // No overlap, place normally
+            if (item.sourcePosition) {
+              // Moving existing component
+              onComponentMove(item.component.id, position);
+            } else {
+              // Adding new component - create a new component with unique ID
+              const newComponent = {
+                ...item.component,
+                id: `${item.component.id}-${Date.now()}`,
+              };
+              onComponentDrop(newComponent, position);
+            }
           }
         }
         
@@ -174,6 +186,126 @@ const RackContainer: React.FC<RackContainerProps> = ({
       };
     }
   }, [draggedItem]);
+
+  // Handle component swapping and shifting
+  const handleComponentSwap = (draggedItem: DragItem, newPosition: RackPosition, overlappingComponents: RackComponent[]) => {
+    console.log('=== SWAP DEBUG ===');
+    console.log('Dragged:', draggedItem.component.name, 'height:', draggedItem.component.height);
+    console.log('Target position:', newPosition.rackUnit);
+    console.log('Overlapping:', overlappingComponents.map(c => ({ 
+      name: c.name, 
+      height: c.height, 
+      currentPos: c.position?.rackUnit 
+    })));
+    
+    if (draggedItem.sourcePosition) {
+      // Moving existing component - simple position swap
+      const draggedComponent = components.find(c => c.id === draggedItem.component.id);
+      if (!draggedComponent || !draggedComponent.position) return;
+      
+      const draggedOriginalPosition = draggedComponent.position;
+      console.log('Dragged original position:', draggedOriginalPosition.rackUnit);
+      
+      if (overlappingComponents.length === 1) {
+        // Simple 1:1 swap - just exchange positions
+        const overlapping = overlappingComponents[0];
+        if (overlapping.position) {
+          console.log('Moving', overlapping.name, 'to position:', draggedOriginalPosition.rackUnit);
+          console.log('Moving', draggedComponent.name, 'to position:', newPosition.rackUnit);
+          
+          // Check if the overlapping component will fit at the dragged component's original position
+          const overlappingNewBottom = draggedOriginalPosition.rackUnit - overlapping.height + 1;
+          console.log('Overlapping component bottom would be:', overlappingNewBottom);
+          
+          if (overlappingNewBottom >= 1) {
+            // Move overlapping component to dragged component's original position
+            onComponentMove(overlapping.id, draggedOriginalPosition);
+            // Move dragged component to new position
+            onComponentMove(draggedComponent.id, newPosition);
+          } else {
+            console.log('Overlapping component too large for original position, finding alternative');
+            // Find alternative position for the overlapping component
+            const alternativePos = findAvailablePosition(overlapping, components.filter(c => c.id !== overlapping.id && c.id !== draggedComponent.id), rackHeight);
+            if (alternativePos) {
+              console.log('Found alternative position:', alternativePos.rackUnit);
+              onComponentMove(overlapping.id, alternativePos);
+              onComponentMove(draggedComponent.id, newPosition);
+            }
+          }
+        }
+      } else if (overlappingComponents.length > 1) {
+        // Multiple overlapping components - stack them starting from dragged's original position
+        let currentPosition = draggedOriginalPosition.rackUnit;
+        console.log('Stacking multiple components starting from:', currentPosition);
+        
+        for (const overlapping of overlappingComponents) {
+          const newPos = { x: 0, y: 0, rackUnit: currentPosition };
+          console.log('Moving', overlapping.name, 'to position:', currentPosition);
+          onComponentMove(overlapping.id, newPos);
+          currentPosition -= overlapping.height;
+        }
+        
+        // Move dragged component to new position
+        console.log('Moving dragged to final position:', newPosition.rackUnit);
+        onComponentMove(draggedComponent.id, newPosition);
+      }
+    } else {
+      // Adding new component - just move overlapping components to make space
+      const newComponent = {
+        ...draggedItem.component,
+        id: `${draggedItem.component.id}-${Date.now()}`,
+      };
+      
+      // For new components, just shift overlapping components down or find new spots
+      let availableComponents = [...components];
+      
+      for (const overlapping of overlappingComponents) {
+        availableComponents = availableComponents.filter(c => c.id !== overlapping.id);
+        
+        const newPos = findAvailablePosition(overlapping, availableComponents, rackHeight);
+        if (newPos) {
+          onComponentMove(overlapping.id, newPos);
+          availableComponents.push({ ...overlapping, position: newPos });
+        }
+      }
+      
+      onComponentDrop(newComponent, newPosition);
+    }
+    console.log('=== END SWAP DEBUG ===');
+  };
+  
+  // Find available position for a component
+  const findAvailablePosition = (component: RackComponent, existingComponents: RackComponent[], maxRackHeight: number): RackPosition | null => {
+    // Search from top to bottom for an available position
+    for (let unit = maxRackHeight; unit >= component.height; unit--) {
+      const bottomUnit = unit - component.height + 1;
+      
+      // Ensure component fits within rack bounds
+      if (bottomUnit < 1) continue;
+      
+      // Check if this position is free
+      const hasOverlap = existingComponents.some(existing => {
+        if (!existing.position || existing.id === component.id) return false;
+        
+        // Define the ranges consistently with drop logic
+        const existingTopUnit = existing.position.rackUnit;
+        const existingBottomUnit = existing.position.rackUnit - existing.height + 1;
+        const newTopUnit = unit;
+        const newBottomUnit = bottomUnit;
+        
+        // Two ranges overlap if: max(start1, start2) <= min(end1, end2)
+        const overlapStart = Math.max(newBottomUnit, existingBottomUnit);
+        const overlapEnd = Math.min(newTopUnit, existingTopUnit);
+        
+        return overlapStart <= overlapEnd;
+      });
+      
+      if (!hasOverlap) {
+        return { x: 0, y: 0, rackUnit: unit };
+      }
+    }
+    return null; // No available position found
+  };
 
   // Calculate rack dimensions - responsive width, fixed height
   const rackHeight_px = rackHeight * RACK_UNIT_HEIGHT; // rack units to pixels
