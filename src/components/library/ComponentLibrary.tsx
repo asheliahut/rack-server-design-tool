@@ -211,10 +211,6 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({
                       component={component}
                       onSelect={onComponentSelect}
                     />
-                    {/* Mobile drag hint */}
-                    <div className="absolute top-1 right-1 bg-blue-500 text-white text-xs px-1 py-0.5 rounded opacity-75">
-                      Drag
-                    </div>
                   </div>
                 ))}
               </div>
