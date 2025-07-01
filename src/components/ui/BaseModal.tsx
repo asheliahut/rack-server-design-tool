@@ -7,7 +7,7 @@ interface BaseModalProps {
   onClose: () => void;
   title?: string;
   children: ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | 'full';
   showCloseButton?: boolean;
   closeOnOverlayClick?: boolean;
   className?: string;
@@ -19,7 +19,10 @@ const sizeClasses = {
   md: 'max-w-md',
   lg: 'max-w-lg',
   xl: 'max-w-xl',
-  full: 'max-w-full mx-4',
+  '2xl': 'max-w-2xl',
+  '3xl': 'max-w-3xl',
+  '4xl': 'max-w-4xl',
+  full: 'w-full max-w-7xl mx-4 sm:mx-6 lg:mx-8',
 };
 
 export function BaseModal({
@@ -92,7 +95,7 @@ export function BaseModal({
         )}
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto scrollbar-thin p-4">
           {children}
         </div>
 

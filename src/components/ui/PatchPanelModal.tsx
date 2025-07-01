@@ -4,7 +4,6 @@ import { Save, RotateCcw } from 'lucide-react';
 import { BaseModal } from './BaseModal';
 import Button from './Button';
 import { Input } from './Input';
-import { ComponentGrid } from './ResponsiveGrid';
 import { StatusIndicator } from './StatusIndicator';
 
 interface PatchPanelModalProps {
@@ -104,7 +103,7 @@ const PatchPanelModal: React.FC<PatchPanelModalProps> = ({
       isOpen={isOpen}
       onClose={handleClose}
       title={`Port Labeling - ${component.customName || component.name}`}
-      size="xl"
+      size="full"
       footer={footer}
       closeOnOverlayClick={false}
     >
@@ -138,15 +137,15 @@ const PatchPanelModal: React.FC<PatchPanelModalProps> = ({
       </div>
 
       {/* Port Grid */}
-      <div className="max-h-96 overflow-y-auto">
-        <ComponentGrid>
+      <div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {portLabels.map((portLabel) => (
             <div
               key={portLabel.portNumber}
-              className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-gray-300 dark:hover:border-gray-600 transition-colors bg-white dark:bg-gray-800"
+              className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 hover:border-gray-300 dark:hover:border-gray-600 transition-colors bg-white dark:bg-gray-800"
             >
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-base font-medium text-gray-900 dark:text-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-lg font-medium text-gray-900 dark:text-gray-100">
                   Port {portLabel.portNumber}
                 </span>
                 <StatusIndicator 
@@ -155,7 +154,7 @@ const PatchPanelModal: React.FC<PatchPanelModalProps> = ({
                 />
               </div>
               
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <Input
                   label="Label"
                   value={portLabel.label}
@@ -176,7 +175,7 @@ const PatchPanelModal: React.FC<PatchPanelModalProps> = ({
               </div>
             </div>
           ))}
-        </ComponentGrid>
+        </div>
       </div>
     </BaseModal>
   );
